@@ -37,4 +37,4 @@ Dynamic Visualizations:
 Present data through engaging charts and graphs, allowing users to track their sentiment trends and compare different playlists or time periods.
 
 Community Sharing & Comparison:
-Enable users to share their mood profiles and sentiment insights with friends or the broader community, fostering discussions about music and emotional health.
+Enable users to share their mood profiles and sentiment insights with friends or the broader community, fostering discussions about music and emotional health
