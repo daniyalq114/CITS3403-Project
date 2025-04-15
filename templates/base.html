@@ -11,11 +11,36 @@
     <div class="container">
       <a href="{{ url_for('index') }}" class="logo">LugiAnalytics</a>
       <ul class="nav-links">
-        <li><a href="{{ url_for('index') }}" class="{% if active=='home' %}active{% endif %}">Home</a></li>
-        <li><a href="#" class="{% if active=='upload' %}active{% endif %}">Upload</a></li>
-        <li><a href="#" class="{% if active=='visualise' %}active{% endif %}">Visualise</a></li>
-        <li><a href="#" class="{% if active=='network' %}active{% endif %}">Network</a></li>
-        <li><a href="#" class="{% if active=='login' %}active{% endif %}">Log In</a></li>
+        <li>
+          <a href="{{ url_for('index') }}"
+             class="{% if active=='home' %}active{% endif %}">
+            Home
+          </a>
+        </li>
+        <li>
+          <a href="{{ url_for('upload') }}"
+             class="{% if active=='upload' %}active{% endif %}">
+            Upload
+          </a>
+        </li>
+        <li>
+          <a href="{{ url_for('visualise') }}"
+             class="{% if active=='visualise' %}active{% endif %}">
+            Visualise
+          </a>
+        </li>
+        <li>
+          <a href="{{ url_for('network') }}"
+             class="{% if active=='network' %}active{% endif %}">
+            Network
+          </a>
+        </li>
+        <li>
+          <a href="{{ url_for('login') }}"
+             class="{% if active=='login' %}active{% endif %}">
+            Log In
+          </a>
+        </li>
       </ul>
     </div>
   </nav>
