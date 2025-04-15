@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <h1>Upload your Data</h1>
+
+  <form action="{{ url_for('upload') }}" method="post" class="upload-form">
+    <div class="step">
+      <p>Step 1: Enter your Pokémon Showdown username</p>
+      <input type="text" name="username" placeholder="Your Showdown username" required>
+    </div>
+    <div class="step">
+      <p>Step 2: Enter the PokéPaste for your team</p>
+      <input type="url" name="pokepaste" placeholder="https://pokepast.es/…" required>
+    </div>
+    <div class="step">
+      <p>Step 3: Enter your Pokémon Showdown replays</p>
+      <textarea name="replays" rows="8" placeholder="One URL per line" required></textarea>
+    </div>
+    <div class="step">
+      <p>Step 4: Submit to visualise your performance!</p>
+      <button type="submit" class="btn generate-btn">Generate Report</button>
+    </div>
+  </form>
+{% endblock %}
+
