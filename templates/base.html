@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LugiAnalytics</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}" />
+</head>
+<body>
+  <nav class="navbar">
+    <div class="container">
+      <a href="{{ url_for('index') }}" class="logo">LugiAnalytics</a>
+      <ul class="nav-links">
+        <li><a href="{{ url_for('index') }}" class="{% if active=='home' %}active{% endif %}">Home</a></li>
+        <li><a href="#" class="{% if active=='upload' %}active{% endif %}">Upload</a></li>
+        <li><a href="#" class="{% if active=='visualise' %}active{% endif %}">Visualise</a></li>
+        <li><a href="#" class="{% if active=='network' %}active{% endif %}">Network</a></li>
+        <li><a href="#" class="{% if active=='login' %}active{% endif %}">Log In</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <main class="content">
+    {% block content %}{% endblock %}
+  </main>
+</body>
+</html>
