@@ -9,7 +9,15 @@
 <body>
   <nav class="navbar">
     <div class="container">
-      <a href="{{ url_for('index') }}" class="logo">LugiAnalytics</a>
+      <a href="{{ url_for('index') }}" class="logo">
+        <img
+          src="{{ url_for('static', filename='images/logo.png') }}"
+          alt="LugiAnalytics logo"
+          class="logo-img"
+        >
+        LugiAnalytics
+      </a>
+      
       <ul class="nav-links">
         <li>
           <a href="{{ url_for('index') }}"
