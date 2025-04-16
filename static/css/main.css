@@ -30,6 +30,9 @@ body {
   display: flex;
   align-items: center;
   text-decoration: none;
+  font-size: 1.75rem;  /* larger */
+  font-weight: 700;    /* bolder */
+  color: #fff;         /* ensure it stays white */
 }
 .logo-img {
   height: 40px;
@@ -47,7 +50,8 @@ body {
 .nav-links a {
   color: #fff;
   text-decoration: none;
-  font-weight: 500;
+  font-size: 1.1rem;    /* slightly larger */
+  font-weight: 600;     /* semi‑bold */
   transition: color 0.2s;
 }
 .nav-links a.active,
