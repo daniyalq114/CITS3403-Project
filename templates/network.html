@@ -1,4 +1,33 @@
 {% extends "base.html" %}
+
 {% block content %}
-  <h1>Network (coming soon)</h1>
+  <h1>Expand your Network</h1>
+  <p>Enter the username of someone you’d like to connect with:</p>
+
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      <ul class="flashes">
+        {% for category, msg in messages %}
+          <li class="flash {{ category }}">{{ msg }}</li>
+        {% endfor %}
+      </ul>
+    {% endif %}
+  {% endwith %}
+
+  <form action="{{ url_for('network') }}" method="post" class="network-form">
+    <input
+      type="text"
+      name="search_user"
+      list="usernames"
+      placeholder="Search username..."
+      required
+    >
+    <datalist id="usernames">
+      {% for u in users %}
+        <option value="{{ u }}">
+      {% endfor %}
+    </datalist>
+
+    <button type="submit" class="btn">Send Request</button>
+  </form>
 {% endblock %}

@@ -1,6 +1,7 @@
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, render_template, request, redirect, url_for, flash
 
 app = Flask(__name__)
+app.secret_key = "dev"  # needed for flash messages
 
 @app.route("/")
 def index():
@@ -9,21 +10,34 @@ def index():
 @app.route("/upload", methods=["GET", "POST"])
 def upload():
     if request.method == "POST":
-        # TODO: handle form
+        username  = request.form.get("username", "")
+        pokepaste = request.form.get("pokepaste", "")
+        replays   = request.form.get("replays", "").splitlines()
+        # TODO: process these values (e.g. save to DB, parse, etc.)
         return redirect(url_for("index"))
     return render_template("upload.html", active="upload")
 
-# Stubbed routes so url_for() works
-@app.route("/visualise")
+@app.route("/visualise", methods=["GET", "POST"])
 def visualise():
+    # stub for future implementation
     return render_template("visualise.html", active="visualise")
 
-@app.route("/network")
+@app.route("/network", methods=["GET", "POST"])
 def network():
-    return render_template("network.html", active="network")
+    # Example users list; replace with real data source
+    users = ["Ash", "Misty", "Brock", "May", "Dawn", "Gary"]
 
-@app.route("/login")
+    if request.method == "POST":
+        target = request.form.get("search_user", "")
+        # TODO: send friend request to `target`
+        flash(f"Friend request sent to {target}", "success")
+        return redirect(url_for("network"))
+
+    return render_template("network.html", active="network", users=users)
+
+@app.route("/login", methods=["GET", "POST"])
 def login():
+    # stub for future implementation
     return render_template("login.html", active="login")
 
 if __name__ == "__main__":
