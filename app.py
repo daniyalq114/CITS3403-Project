@@ -1,4 +1,5 @@
 from flask import Flask, render_template, request, redirect, url_for, flash
+import random
 
 app = Flask(__name__)
 app.secret_key = "dev"  # needed for flash messages
@@ -19,8 +20,28 @@ def upload():
 
 @app.route("/visualise", methods=["GET", "POST"])
 def visualise():
-    # stub for future implementation
-    return render_template("visualise.html", active="visualise")
+    data_submitted = False
+    username = ""
+    if request.method == "POST":
+        username = request.form.get("username", "").strip()
+        # TODO: load real data for this username
+        data_submitted = True
+
+        # Example dummy data (you can remove when you have real stats)
+        labels = ["Win", "Loss", "Draw"]
+        values = [random.randint(1, 10) for _ in labels]
+    else:
+        labels = []
+        values = []
+
+    return render_template(
+        "visualise.html",
+        active="visualise",
+        data_submitted=data_submitted,
+        username=username,
+        labels=labels,
+        values=values
+    )
 
 @app.route("/network", methods=["GET", "POST"])
 def network():
