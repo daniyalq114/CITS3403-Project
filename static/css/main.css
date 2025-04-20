@@ -87,8 +87,7 @@ body {
   font-weight: 500;
   margin-bottom: 0.5rem;
 }
-.upload-form input,
-.upload-form textarea {
+.upload-form input {
   width: 100%;
   padding: 0.6rem;
   border: 1px solid #ccc;
@@ -96,14 +95,32 @@ body {
   font-size: 1rem;
   background: #fff;
 }
-/* Striped background for textarea */
-.upload-form textarea {
-  background: repeating-linear-gradient(
-    white,
-    white 30px,
-    #ffecec 30px,
-    #ffecec 60px
-  );
+.replays-table {
+  width: 100%;
+  padding: 0.6rem;
+  border-collapse: collapse;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 1rem;
+}
+.replays-table tr:nth-child(odd) {
+  background-color: white;
+}
+.replays-table tr:nth-child(even) {
+  background-color: #ffecec;
+}
+.replays-table td {
+  padding: 0.6rem;
+  border: 1px solid #ccc;
+  text-align: left;
+  font-size: 1rem;
+  height: 2.5rem; 
+  overflow: hidden; 
+}
+.replays-table td[contenteditable="true"] {
+  outline: none;
+  overflow: hidden; 
+  text-overflow: ellipsis; 
 }
 .generate-btn {
   display: block;
