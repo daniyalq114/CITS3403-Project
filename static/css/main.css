@@ -1,3 +1,16 @@
+/* Theme variables */
+:root {
+  --bg-color: #eef2f8;
+  --text-color: #333;
+  --primary-color: #2a2e6a;
+}
+
+[data-theme="dark"] {
+  --bg-color: #121212;
+  --text-color: #eee;
+  --primary-color: #90caf9;
+}
+
 /* Reset & base */
 * {
   box-sizing: border-box;
@@ -7,13 +20,13 @@
 
 body {
   font-family: Arial, sans-serif;
-  background: #eef2f8;
-  color: #333;
+  background: var(--bg-color);
+  color: var(--text-color);
 }
 
 /* Navbar */
 .navbar {
-  background: #2a2e6a;
+  background: var(--primary-color);
 }
 
 .navbar .container {
@@ -146,7 +159,7 @@ body {
   display: block;
   width: 100%;
   padding: 0.75rem;
-  background: #2a2e6a;
+  background: var(--primary-color);
   color: #fff;
   border: none;
   border-radius: 4px;
@@ -182,7 +195,7 @@ body {
   display: block;
   width: 100%;
   padding: 0.75rem;
-  background: #2a2e6a;
+  background: var(--primary-color);
   color: #fff;
   border: none;
   border-radius: 4px;
@@ -223,7 +236,7 @@ body {
   justify-content: center;
   align-items: center;
   height: calc(100vh - 64px); /* adjust for navbar height */
-  background: linear-gradient(135deg, #2a2e6a, #ff6b6b);
+  background: linear-gradient(135deg, var(--primary-color), #ff6b6b);
 }
 
 /* Auth card */
@@ -246,7 +259,7 @@ body {
 }
 .auth-card h2 {
   margin-bottom: 0.5rem;
-  color: #2a2e6a;
+  color: var(--primary-color);
 }
 .subtitle {
   margin-bottom: 1.5rem;
@@ -273,13 +286,13 @@ body {
 .auth-form input:focus {
   outline: none;
   box-shadow: 0 0 4px rgba(42, 46, 106, 0.6);
-  border-color: #2a2e6a;
+  border-color: var(--primary-color);
 }
 
 /* Auth buttons */
 .auth-btn {
   margin-top: 1rem;
-  background: #2a2e6a;
+  background: var(--primary-color);
   color: #fff;
   border: none;
   padding: 0.75rem;
@@ -338,7 +351,7 @@ body {
 .form-inline input:focus {
   outline: none;
   box-shadow: 0 0 4px rgba(42, 46, 106, 0.6);
-  border-color: #2a2e6a;
+  border-color: var(--primary-color);
 }
 .form-inline .btn {
   padding: 0 1.5rem;
@@ -365,7 +378,7 @@ body {
   margin: 2.5rem 0 1rem;
   font-size: 1.25rem;
   font-weight: 600;
-  color: #2a2e6a;
+  color: var(--primary-color);
 }
 
 /* Part 1 placeholder sizing */
