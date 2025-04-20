@@ -1,0 +1,343 @@
+/* Reset & base */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: Arial, sans-serif;
+  background: #eef2f8;
+  color: #333;
+}
+
+/* Navbar */
+.navbar {
+  background: #2a2e6a;
+}
+
+.navbar .container {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 1rem;
+}
+
+/* Logo */
+.logo {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+  font-size: 1.75rem;  /* larger */
+  font-weight: 700;    /* bolder */
+  color: #fff;         /* ensure it stays white */
+}
+.logo-img {
+  height: 40px;
+  margin-right: 0.5rem;
+}
+
+/* Navigation links */
+.nav-links {
+  list-style: none;
+  display: flex;
+}
+.nav-links li {
+  margin-left: 1.5rem;
+}
+.nav-links a {
+  color: #fff;
+  text-decoration: none;
+  font-size: 1.1rem;    /* slightly larger */
+  font-weight: 600;     /* semi‑bold */
+  transition: color 0.2s;
+}
+.nav-links a.active,
+.nav-links a:hover {
+  color: #ff6b6b;
+}
+
+/* Page content */
+.content {
+  max-width: 800px;
+  margin: 3rem auto;
+  text-align: center;
+}
+.content h1 {
+  font-size: 2.5rem;
+  margin-bottom: 1rem;
+}
+.content p {
+  font-size: 1.1rem;
+  line-height: 1.5;
+}
+
+/* Upload form */
+.upload-form {
+  max-width: 600px;
+  margin: 2rem auto;
+  text-align: left;
+}
+.upload-form .step {
+  margin-bottom: 1.5rem;
+}
+.upload-form .step p {
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+}
+.upload-form input {
+  width: 100%;
+  padding: 0.6rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 1rem;
+  background: #fff;
+}
+.replays-table {
+  width: 100%;
+  padding: 0.6rem;
+  border-collapse: collapse;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 1rem;
+}
+.replays-table tr:nth-child(odd) {
+  background-color: white;
+}
+.replays-table tr:nth-child(even) {
+  background-color: #ffecec;
+}
+.replays-table td {
+  padding: 0.6rem;
+  border: 1px solid #ccc;
+  text-align: left;
+  font-size: 1rem;
+  height: 2.5rem; 
+  overflow: hidden; 
+}
+.replays-table td[contenteditable="true"] {
+  outline: none;
+  overflow: hidden; 
+  text-overflow: ellipsis; 
+}
+.generate-btn {
+  display: block;
+  width: 100%;
+  padding: 0.75rem;
+  background: #2a2e6a;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  font-size: 1rem;
+  cursor: pointer;
+}
+.generate-btn:hover {
+  background: #24265a;
+}
+
+/* Network form */
+.network-form {
+  max-width: 400px;
+  margin: 2rem auto;
+  text-align: left;
+}
+.network-form input {
+  width: 100%;
+  padding: 0.6rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  margin-bottom: 1rem;
+  font-size: 1rem;
+}
+
+/* Buttons */
+.btn {
+  display: block;
+  width: 100%;
+  padding: 0.75rem;
+  background: #2a2e6a;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  font-size: 1rem;
+  cursor: pointer;
+}
+.btn:hover {
+  background: #24265a;
+}
+
+/* Flash messages */
+.flashes {
+  list-style: none;
+  padding: 0;
+  margin-bottom: 1rem;
+}
+.flash.success {
+  background: #d4edda;
+  color: #155724;
+  padding: 0.75rem;
+  border-radius: 4px;
+}
+.flash.error {
+  background: #f8d7da;
+  color: #721c24;
+  padding: 0.75rem;
+  border-radius: 4px;
+}
+
+/* Auth pages wrapper */
+.auth-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: calc(100vh - 64px); /* adjust for navbar height */
+  background: linear-gradient(135deg, #2a2e6a, #ff6b6b);
+}
+
+/* Auth card */
+.auth-card {
+  background: #fff;
+  padding: 2rem;
+  border-radius: 8px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+  width: 320px;
+  text-align: center;
+}
+.auth-logo {
+  height: 50px;
+  margin-bottom: 1rem;
+}
+.auth-card h2 {
+  margin-bottom: 0.5rem;
+  color: #2a2e6a;
+}
+.subtitle {
+  margin-bottom: 1.5rem;
+  color: #666;
+}
+
+/* Auth form */
+.auth-form .form-group {
+  margin-bottom: 1rem;
+  text-align: left;
+}
+.auth-form label {
+  display: block;
+  margin-bottom: 0.4rem;
+  font-weight: 600;
+}
+.auth-form input {
+  width: 100%;
+  padding: 0.6rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+/* Auth buttons */
+.auth-btn {
+  margin-top: 1rem;
+  background: #2a2e6a;
+  color: #fff;
+  border: none;
+  padding: 0.75rem;
+  width: 100%;
+  border-radius: 4px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.auth-btn:hover {
+  background: #24265a;
+}
+
+/* Switch text */
+.switch-text {
+  margin-top: 1rem;
+  font-size: 0.9rem;
+  color: #444;
+}
+.switch-text a {
+  color: #ff6b6b;
+  text-decoration: none;
+  font-weight: 600;
+}
+.switch-text a:hover {
+  text-decoration: underline;
+}
+
+/* Visualise page form */
+.visualise-form {
+  margin: 2rem auto;
+  max-width: 600px;
+  text-align: center;
+}
+.visualise-form label {
+  display: block;
+  margin-bottom: 0.75rem;
+  font-weight: 500;
+}
+.form-inline {
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+}
+.form-inline input {
+  flex: 1;
+  padding: 0.6rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+.form-inline .btn {
+  padding: 0 1.5rem;
+}
+
+/* Placeholder boxes for future tables and charts */
+.placeholder-table {
+  width: 90%;
+  height: 200px;
+  margin: 1rem auto 2rem;
+  background: #fff;
+  border: 2px dashed #ccc;
+  border-radius: 4px;
+}
+
+/* Section labels above each part */
+.section-label {
+  display: block;
+  margin: 2.5rem 0 1rem;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #2a2e6a;
+}
+
+/* Part 1 placeholder sizing */
+.placeholder-table.replay-record {
+  width: 100%;
+  height: 180px;
+}
+
+/* Part 2: two items side by side */
+.part2-container {
+  display: flex;
+  justify-content: center;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+  margin-bottom: 2rem;
+}
+.placeholder-table.part2 {
+  flex: 0 1 45%;
+  height: 200px;
+}
+
+/* Part 3: grid of 4 usage charts */
+.part3-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+.placeholder-table.part3 {
+  height: 180px;
+}

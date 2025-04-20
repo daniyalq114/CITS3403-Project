@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="auth-container">
+  <div class="auth-card">
+    <h2>Create Account</h2>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <ul class="flashes">
+          {% for cat, msg in messages %}
+            <li class="flash {{ cat }}">{{ msg }}</li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+    {% endwith %}
+    <form action="{{ url_for('signup') }}" method="post" class="auth-form">
+      <div class="form-group">
+        <label for="new-username">Username</label>
+        <input type="text" id="new-username" name="username" required>
+      </div>
+      <div class="form-group">
+        <label for="new-password">Password</label>
+        <input type="password" id="new-password" name="password" required>
+      </div>
+      <button type="submit" class="btn auth-btn">Sign Up</button>
+    </form>
+    <p class="switch-text">
+      Already have an account?
+      <a href="{{ url_for('login') }}">Log In</a>
+    </p>
+  </div>
+</div>
+{% endblock %}

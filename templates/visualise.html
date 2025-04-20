@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <div class="content">
+    <h1>Visualise your Replays</h1>
+
+    <form action="{{ url_for('visualise') }}" method="post" class="visualise-form">
+      <label for="username">
+        Enter the Pokémon Showdown username whose report you want to view
+      </label>
+      <div class="form-inline">
+        <input
+          type="text"
+          id="username"
+          name="username"
+          value="{{ username }}"
+          required
+          placeholder="username"
+        >
+        <button type="submit" class="btn">Submit</button>
+      </div>
+    </form>
+
+    {% if data_submitted %}
+      <!-- Part 1 -->
+      <p class="section-label">Part 1: Replay Record</p>
+      <div class="placeholder-table replay-record"></div>
+
+      <!-- Part 2 -->
+      <p class="section-label">Part 2: Individual Pokémon Data</p>
+      <div class="part2-container">
+        <div class="placeholder-table part2"></div>
+        <div class="placeholder-table part2"></div>
+      </div>
+
+      <!-- Part 3 -->
+      <p class="section-label">Part 3: Move Usage</p>
+      <div class="part3-container">
+        <div class="placeholder-table part3"></div>
+        <div class="placeholder-table part3"></div>
+        <div class="placeholder-table part3"></div>
+        <div class="placeholder-table part3"></div>
+      </div>
+    {% endif %}
+  </div>
+{% endblock %}
+
+
