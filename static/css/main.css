@@ -307,8 +307,8 @@ body {
   justify-content: center;
   gap: 1.5rem;
   flex-wrap: wrap;
-  margin-bottom: 2rem;
-}
+  margin-bottom: 2rem;~
+{}
 .placeholder-table.part2 {
   flex: 0 1 45%;
   height: 200px;
@@ -323,4 +323,5 @@ body {
 }
 .placeholder-table.part3 {
   height: 180px;
+}
 }
