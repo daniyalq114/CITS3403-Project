@@ -14,7 +14,15 @@
     </div>
     <div class="step">
       <p>Step 3: Enter your Pokémon Showdown replays</p>
-      <textarea name="replays" rows="8" placeholder="One URL per line" required></textarea>
+      <table class="replays-table">
+        <tbody>
+          {% for i in range(40) %}
+          <tr>
+            <td contenteditable="true"><input type="text" placeholder="https://replay.pokemonshowdown.com/..."></td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
     </div>
     <div class="step">
       <p>Step 4: Submit to visualise your performance!</p>
