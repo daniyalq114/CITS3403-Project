@@ -50,7 +50,7 @@ def network():
 
     if request.method == "POST":
         target = request.form.get("search_user", "")
-        # TODO: send friend request to `target`
+        # TODO: send friend request to target
         flash(f"Friend request sent to {target}", "success")
         return redirect(url_for("network"))
 
