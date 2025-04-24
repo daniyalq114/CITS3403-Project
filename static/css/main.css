@@ -40,24 +40,26 @@ body {
 }
 
 /* Navigation links */
-.nav-links {
-  list-style: none;
+.navbar-nav {
   display: flex;
+  align-items: center;
+  gap: 1.5rem;
 }
-.nav-links li {
-  margin-left: 1.5rem;
-}
-.nav-links a {
+
+.navbar-nav .nav-link {
   color: #fff;
   text-decoration: none;
-  font-size: 1.1rem;    /* slightly larger */
-  font-weight: 600;     /* semi‑bold */
+  font-size: 1.1rem;
+  font-weight: 600;
   transition: color 0.2s;
 }
-.nav-links a.active,
-.nav-links a:hover {
-  color: #ff6b6b;
+
+.navbar-nav .nav-link:hover,
+.navbar-nav .nav-link.active {
+  color: #ff6b6b !important;
+  border-bottom: 2px solid #ff6b6b;
 }
+
 
 /* Page content */
 .content {
@@ -72,6 +74,13 @@ body {
 .content p {
   font-size: 1.1rem;
   line-height: 1.5;
+}
+
+/* Index page */
+.lugia-img {
+  max-width: 300px;
+  width: 100%;
+  height: auto;
 }
 
 /* Upload form */
