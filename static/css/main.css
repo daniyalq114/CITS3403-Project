@@ -60,7 +60,6 @@ body {
   border-bottom: 2px solid #ff6b6b;
 }
 
-
 /* Page content */
 .content {
   max-width: 800px;
@@ -69,6 +68,10 @@ body {
 }
 .content h1 {
   font-size: 2.5rem;
+  margin-bottom: 1rem;
+}
+.content h2 {
+  font-size: 2rem;
   margin-bottom: 1rem;
 }
 .content p {
