@@ -98,6 +98,7 @@ body {
 .upload-form .step p {
   font-weight: 500;
   margin-bottom: 0.5rem;
+  text-align: center;
 }
 .upload-form input {
   width: 100%;
