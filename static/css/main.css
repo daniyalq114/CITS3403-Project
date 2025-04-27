@@ -3,12 +3,21 @@
   box-sizing: border-box;
   margin: 0;
   padding: 0;
+  /* For some reason, these vars do nothing if i put this under root */
+  --bs-body-bg: rgb(233, 238, 247) !important;
+  --bs-navbar-hover-color: #ff6b6b !important;
+  --bs-emphasis-color-rgb: #ff6b6b !important;
+  /* --bs-navbar-color:var(--bs-emphasis-color-rgb) !important; */
+  --bs-navbar-active-color: #ff6b6b !important;
+  --bs-link-hover-color-rgb: #ff6b6b !important;
+  --bs-btn-bg: #2a2e6a !important;
+  --bs-btn-border-color: #2a2e6a !important;
 }
 
 body {
   font-family: Arial, sans-serif;
-  background: #eef2f8;
-  color: #333;
+  /* background-color: rgb(233, 238, 247) !important; */
+  color: #333; 
 }
 
 /* Navbar */
@@ -53,11 +62,12 @@ body {
   font-weight: 600;
   transition: color 0.2s;
 }
-
-.navbar-nav .nav-link:hover,
+/* this is a bit dodgy */
+.navbar-nav .nav-link:hover {
+  border-bottom: 2px solid #ff6b6b; 
+}
 .navbar-nav .nav-link.active {
-  color: #ff6b6b !important;
-  border-bottom: 2px solid #ff6b6b;
+  border-bottom: 2px solid #ff7b9c; 
 }
 
 /* Page content */
@@ -87,6 +97,9 @@ body {
 }
 
 /* Upload form */
+.row {
+  justify-content: center;
+}
 .upload-form {
   max-width: 600px;
   margin: 2rem auto;
@@ -170,8 +183,7 @@ body {
   display: block;
   width: 100%;
   padding: 0.75rem;
-  background: #2a2e6a;
-  color: #fff;
+  color: #fff !important;
   border: none;
   border-radius: 4px;
   font-size: 1rem;
