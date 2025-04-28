@@ -1,24 +1,24 @@
 {% extends "base.html" %}
 {% block content %}
-<div class="row">
+<div class="row d-flex align-items-center rounded" id="maintext">
   <!-- Image column - will be full width on mobile, half width on desktop -->
   <div class="col-12 col-md-4 d-flex flex-column justify-content-center align-items-center mt-2 mb-2 mx-auto">
     <img src="{{ url_for('static', filename='images/lugia.png') }}" alt="LugiAnalytics logo" class="lugia-img mx-auto">
   </div>
-  
   <!-- Text column - will be full width on mobile, half width on desktop -->
-  <div class="col-12 col-md-8 d-flex flex-column justify-content-center align-items-center ps-md-4 mx-auto">
-    <h1>LugiAnalytics?</h1>
+  <div class="col-12 col-md-8 d-flex flex-column justify-content-center align-items-center ps-md-4 mx-auto text-left text-md-start">
+    <h1 id="titleheader">LugiAnalytics</h1>
     <h2>Your Path to Mastery</h2>
     <p>
       <strong>Welcome to LugiAnalytics</strong> — the ultimate replay analyzer for competitive Pokémon Showdown players. Just enter your Showdown username, share your team via a Pokepaste link, and paste your battle replay URLs.
     </p>
     <p>
-      We'll automatically extract key metrics—win/loss results, opponent teams, ELO shifts, move usage, and overall team performance—and transform them into clear, interactive charts and summaries.
+      We'll automatically extract <b>key metrics</b>—win/loss results, opponent teams, ELO shifts, move usage, and overall team performance—and transform them into clear, interactive charts and summaries.
     </p>
     <p>
       Use these insights to review your match history, fine‑tune your strategies, and dominate every battle. Our sleek UI is crafted in Figma, powered by an HTML parser that brings your replays to life.
     </p>
   </div>
+  <canvas class="glslCanvas" data-fragment-url="{{ url_for('static', filename='shader.frag') }}"></canvas>
 </div>
 {% endblock %}
