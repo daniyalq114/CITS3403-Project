@@ -20,7 +20,7 @@ def upload():
 
 @app.route("/visualise", methods=["GET", "POST"])
 def visualise():
-    data_submitted = False
+    data_submitted = True
     username = ""
     if request.method == "POST":
         username = request.form.get("username", "").strip()
