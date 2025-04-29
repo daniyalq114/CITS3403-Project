@@ -20,7 +20,7 @@ def upload():
 
 @app.route("/visualise", methods=["GET", "POST"])
 def visualise():
-    data_submitted = False
+    data_submitted = True
     username = ""
     if request.method == "POST":
         username = request.form.get("username", "").strip()
@@ -67,7 +67,7 @@ def signup():
         # TODO: create a new user account
         flash("Account created! You can now log in.", "success")
         return redirect(url_for("login"))
-    return render_template("signup.html", active="login")
+    return render_template("signup.html", active="signup")
 
 if __name__ == "__main__":
     app.run(debug=True)

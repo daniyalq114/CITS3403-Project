@@ -16,12 +16,24 @@
   box-sizing: border-box;
   margin: 0;
   padding: 0;
+  /* For some reason, these vars do nothing if i put this under root */
+  --bs-body-bg: rgb(233, 238, 247) !important;
+  --bs-navbar-hover-color: #ff6b6b !important;
+  --bs-emphasis-color-rgb: #ff6b6b !important;
+  /* --bs-navbar-color:var(--bs-emphasis-color-rgb) !important; */
+  --bs-navbar-active-color: #FF7B9C !important;
+  --bs-link-hover-color-rgb: #ff6b6b !important;
+  --bs-btn-bg: #2a2e6a !important;
+  --bs-btn-border-color: #2a2e6a !important;
+  /* These are being ignored */
+  --bs-btn-hover-color: #ff6b6b !important;
+  /* --bs-btn-hover-border-color: #F0271F !important; */
 }
 
 body {
   font-family: Arial, sans-serif;
-  background: var(--bg-color);
-  color: var(--text-color);
+  /* background-color: rgb(233, 238, 247) !important; */
+  color: #333; 
 }
 
 /* Navbar */
@@ -40,11 +52,13 @@ body {
 
 /* Logo */
 .logo {
+  z-index: 1;
   display: flex;
   align-items: center;
   text-decoration: none;
   font-size: 1.75rem;  /* larger */
   font-weight: 700;    /* bolder */
+  font-family: "Nunito", sans-serif;
   color: #fff;         /* ensure it stays white */
 }
 .logo-img {
@@ -55,43 +69,43 @@ body {
 .logo-img:hover {
   transform: scale(1.1);
 }
-
 /* Navigation links */
-.nav-links {
-  list-style: none;
+.navbar-nav {
   display: flex;
+  align-items: center;
+  gap: 1.5rem;
 }
-.nav-links li {
-  margin-left: 1.5rem;
-}
-.nav-links a {
+
+.navbar-nav .nav-link {
   color: #fff;
   text-decoration: none;
-  font-size: 1.1rem;    /* slightly larger */
-  font-weight: 600;     /* semi‑bold */
-  position: relative;
+  font-size: 1.1rem;
+  font-weight: 600;
   transition: color 0.2s;
 }
-.nav-links a::after {
-  content: "";
-  position: absolute;
-  bottom: -2px;
-  left: 50%;
-  width: 0;
-  height: 3px;
-  background: #ff6b6b;
-  transition: width 0.3s ease, left 0.3s ease;
+/* this is a bit dodgy */
+.navbar-nav .nav-link:hover {
+  border-bottom: 2px solid #ff6b6b; 
 }
-.nav-links a:hover::after,
-.nav-links a.active::after {
-  width: 100%;
+.navbar-nav .nav-link.active {
+  border-bottom: 2px solid #ff7b9c; 
+}
+.nav-item.dropdown {
+  position: relative; 
+}
+.dropdown-menu {
+  background-color: #2a2e6a !important;
+  position: absolute; 
+  top: 100%; 
   left: 0;
+  transform: translateX(0); 
+  width: auto; 
+  z-index: 1050;
 }
-.nav-links a.active,
-.nav-links a:hover {
-  color: #ff6b6b;
+.dropdown-menu .dropdown-item:hover {
+  background-color: #2a2e6a; /* Slightly darker background on hover */
+  color: #ff6b6b; /* Keeps the hover text color consistent with your theme */
 }
-
 /* Page content */
 .content {
   max-width: 800px;
@@ -99,15 +113,51 @@ body {
   text-align: center;
 }
 .content h1 {
+  font-family: "Nunito", sans-serif;
   font-size: 2.5rem;
   margin-bottom: 1rem;
 }
+#titleheader {
+  font-size: 3.5rem;
+}
+.content h2 {
+  font-family: "Roboto", sans-serif;
+  font-size: 2rem;
+  margin-bottom: 1rem;
+  color:#24265a;
+}
 .content p {
+  font-family: "Nunito", sans-serif;
   font-size: 1.1rem;
   line-height: 1.5;
 }
 
+/* Index page */
+.lugia-img {
+  max-width: 300px;
+  width: 100%;
+  height: auto;
+}
+.glslCanvas {
+  position:absolute;
+  justify-self: center;
+  z-index: -1 !important;
+  width:100%;
+  height:100%;
+  /* height: calc(100% - 7rem); */
+  opacity: 0.6;
+  padding:0px !important;
+  padding-bottom: 0rem !important;
+}
+#maintext {
+  background: linear-gradient(135deg, #7086f5b2, #ff7b9cb0) ;
+  padding: 2rem;
+  box-shadow: 0 8px 35px rgba(0, 0, 0, 0.6);
+}
 /* Upload form */
+.row {
+  justify-content: center;
+}
 .upload-form {
   max-width: 600px;
   margin: 2rem auto;
@@ -119,6 +169,7 @@ body {
 .upload-form .step p {
   font-weight: 500;
   margin-bottom: 0.5rem;
+  text-align: center;
 }
 .upload-form input {
   width: 100%;
@@ -195,8 +246,7 @@ body {
   display: block;
   width: 100%;
   padding: 0.75rem;
-  background: var(--primary-color);
-  color: #fff;
+  color: #fff !important;
   border: none;
   border-radius: 4px;
   font-size: 1rem;
@@ -204,11 +254,7 @@ body {
   transition: background-color 0.2s, transform 0.1s;
 }
 .btn:hover {
-  transform: translateY(-2px);
-  background: #24265a;
-}
-.btn:active {
-  transform: translateY(0);
+  background: #24265a !important;
 }
 
 /* Flash messages */
