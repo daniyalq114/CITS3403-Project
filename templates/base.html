@@ -50,8 +50,18 @@
           <li class="nav-item">
             <a class="nav-link {% if active=='network' %}active{% endif %}" href="{{ url_for('network') }}">Network</a>
           </li>
-          <li class="nav-item">
-            <a class="nav-link {% if active=='login' %}active{% endif %}" href="{{ url_for('login') }}">Log In</a>
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+              Account
+            </a>
+            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdownMenuLink">
+              <li class="dropdown-item nav-item">
+                <a class="nav-link {% if active=='login' %}active{% endif %}" href="{{ url_for('login') }}">Log In</a>
+              </li>
+              <li class="dropdown-item nav-item">
+                <a class="nav-link {% if active=='signup' %}active{% endif %}" href="{{ url_for('signup') }}">Sign Up</a>
+              </li>
+            </ul>
           </li>
         </ul>
       </div> 

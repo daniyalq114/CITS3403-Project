@@ -73,6 +73,22 @@ body {
 .navbar-nav .nav-link.active {
   border-bottom: 2px solid #ff7b9c; 
 }
+.nav-item.dropdown {
+  position: relative; 
+}
+.dropdown-menu {
+  background-color: #2a2e6a !important;
+  position: absolute; 
+  top: 100%; 
+  left: 0;
+  transform: translateX(0); 
+  width: auto; 
+  z-index: 1050;
+}
+.dropdown-menu .dropdown-item:hover {
+  background-color: #2a2e6a; /* Slightly darker background on hover */
+  color: #ff6b6b; /* Keeps the hover text color consistent with your theme */
+}
 /* Page content */
 .content {
   max-width: 800px;
