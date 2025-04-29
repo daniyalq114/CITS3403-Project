@@ -24,15 +24,76 @@
     {% if data_submitted %}
       <!-- Part 1 -->
       <p class="section-label">Part 1: Replay Record</p>
-      <!-- <div class="placeholder-table replay-record"></div> -->
-      <div class="replay-record">
-        <div class="part1"></div>
-        <div class="part1"></div>
-        <div class="part1"></div>
-        <div class="part1"></div>
-        <div class="part1"></div>
-        <div class="part1"></div>
-      </div>
+      <table class="replay-record table-striped d-flex flex-column">
+        <thead>
+          <!-- First heading row -->
+          <tr>
+            <th colspan="5"></th> <!-- Empty columns for Game, Result, Replay Links, Opposing Team, Your Picks -->
+            <th colspan="2">Terastallize</th>
+            <th>OTS?</th>
+            <th>ELO</th>
+          </tr>
+          <!-- Second heading row -->
+          <tr>
+            <th>Game</th>
+            <th>Result</th>
+            <th>Replay Links</th>
+            <th>Opposing Team</th>
+            <th>Your Picks</th>
+            <th>You</th>
+            <th>Opp</th>
+            <th>You</th>
+            <th>Opp</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for game in games %}
+          <tr>
+            <!-- Win/Loss -->
+            <td class="{{ 'win' if game.win else 'loss' }}">
+              <b>{{ 'Win' if game.win else 'Loss' }}</b>
+            </td>
+
+            <!-- Enemy User -->
+            <td>
+              <a href="{{ game.enemyusr.search_request }}">{{ game.enemyusr.name }}</a>
+            </td>
+
+            <!-- Replay Link -->
+            <td>
+              <a href="{{ game.replay.search_request }}">{{ game.replay.name }}</a>
+            </td>
+
+            <!-- Opposing Team -->
+            <td class="sprites opp">
+              {% for sprite in game.oppteam %}
+                <img src="{{ sprite }}" alt="sprite">
+              {% endfor %}
+            </td>
+
+            <!-- Your Picks -->
+            <td class="sprites pick">
+              {% for sprite in game.usrpicks %}
+                <img src="{{ sprite }}" alt="sprite">
+              {% endfor %}
+            </td>
+
+            <!-- Terastallize -->
+            <td>
+              {% for t in game.Terastallize %}
+                {{ 'Yes' if t else 'No' }}
+              {% endfor %}
+            </td>
+
+            <!-- OTS -->
+            <td>{{ 'Yes' if game.OTS else 'No' }}</td>
+
+            <!-- ELO -->
+            <td>{{ game.ELO[0] }} -> {{ game.ELO[1] }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
 
       <!-- Part 2 -->
       <p class="section-label">Part 2: Individual Pokémon Data</p>
@@ -44,11 +105,6 @@
       <!-- Part 3 -->
       <p class="section-label">Part 3: Move Usage</p>
       <div class="part3-container">
-        <!-- <div class="placeholder-table part3"></div>
-        <div class="placeholder-table part3"></div>
-        <div class="placeholder-table part3"></div>
-        <div class="placeholder-table part3"></div> -->
-        <div class="part3"></div>
         <div class="part3"></div>
         <div class="part3"></div>
         <div class="part3"></div>
