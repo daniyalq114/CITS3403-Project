@@ -24,14 +24,14 @@
     {% if data_submitted %}
       <!-- Part 1 -->
       <p class="section-label">Part 1: Replay Record</p>
-      <table class="replay-record table-striped d-flex flex-column">
+      <table class="replay-record placeholder-table table-striped">
         <thead>
           <!-- First heading row -->
           <tr>
-            <th colspan="5"></th> <!-- Empty columns for Game, Result, Replay Links, Opposing Team, Your Picks -->
+            <th colspan="6">Game Details</th> <!-- Grouping Game, Result, Replay Links, Opposing Team, Your Picks -->
             <th colspan="2">Terastallize</th>
             <th>OTS?</th>
-            <th>ELO</th>
+            <th colspan="2">ELO</th>
           </tr>
           <!-- Second heading row -->
           <tr>
@@ -40,8 +40,10 @@
             <th>Replay Links</th>
             <th>Opposing Team</th>
             <th>Your Picks</th>
+            <th>Their Picks</th>
             <th>You</th>
             <th>Opp</th>
+            <th></th>
             <th>You</th>
             <th>Opp</th>
           </tr>
@@ -77,19 +79,26 @@
                 <img src="{{ sprite }}" alt="sprite">
               {% endfor %}
             </td>
-
+            <!-- Their Picks -->
+            <td class="sprites pick">
+              {% for sprite in game.opppicks %}
+                <img src="{{ sprite }}" alt="sprite">
+              {% endfor %}
+            </td>
             <!-- Terastallize -->
             <td>
-              {% for t in game.Terastallize %}
-                {{ 'Yes' if t else 'No' }}
-              {% endfor %}
+              {{ 'Yes' if game.Terastallize[0] else 'No' }}
+            </td>
+            <td>
+              {{ 'Yes' if game.Terastallize[1] else 'No' }}
             </td>
 
             <!-- OTS -->
             <td>{{ 'Yes' if game.OTS else 'No' }}</td>
 
             <!-- ELO -->
-            <td>{{ game.ELO[0] }} -> {{ game.ELO[1] }}</td>
+            <td>{{ game.ELO[1] }} <b>↑</b> {{ game.ELO[0] }}</td>
+            <td>{{ game.ELO[2] }}</td>
           </tr>
           {% endfor %}
         </tbody>
@@ -105,11 +114,12 @@
       <!-- Part 3 -->
       <p class="section-label">Part 3: Move Usage</p>
       <div class="part3-container">
-        <div class="part3"></div>
-        <div class="part3"></div>
-        <div class="part3"></div>
-        <div class="part3"></div>
-        <div class="part3"></div>
+        <div class="part3 placeholder-table"></div>
+        <div class="part3 placeholder-table"></div>
+        <div class="part3 placeholder-table"></div>
+        <div class="part3 placeholder-table"></div>
+        <div class="part3 placeholder-table"></div>
+        <div class="part3 placeholder-table"></div>
       </div>
     {% endif %}
   </div>

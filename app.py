@@ -39,7 +39,7 @@ def visualise():
                 "usrpicks":[], 
                 "opppicks":[], 
                 "Terastallize":[],
-                "ELO":[], 
+                "ELO":[0]*3, 
                 "OTS":True,
             },
             {
@@ -50,7 +50,7 @@ def visualise():
                 "usrpicks":[], 
                 "opppicks":[], 
                 "Terastallize":[],
-                "ELO":[], 
+                "ELO":[0]*3, 
                 "OTS":True,
             },
             {
@@ -61,7 +61,7 @@ def visualise():
                 "usrpicks":[], 
                 "opppicks":[], 
                 "Terastallize":[],
-                "ELO":[], 
+                "ELO":[0]*3, 
                 "OTS":True,
             }
         ]
@@ -72,7 +72,7 @@ def visualise():
             response = requests.get(url)
             response.raise_for_status()
             jsondata = response.json()
-            mon["iconurl"] = jsondata["sprites"]["front_default"]  # Fetch the sprite URL
+            mon["iconurl"] = jsondata["sprites"]["front_default"]  
             
         for i in range(2, -1, -1):  # Fix range to include all indices
             temp = [pokemon["iconurl"] for pokemon in usrmon]  # Extract only the icon URLs
@@ -90,6 +90,13 @@ def visualise():
                 except requests.exceptions.RequestException:
                     oppteam_sprites.append(default_sprite)
             data[i]["oppteam"] = oppteam_sprites
+            temp = oppteam_sprites.copy()
+            data[i]["opppicks"] = [temp.pop(randint(0, len(temp) - 1)) for _ in range(4)]
+            # generate elo
+            data[i]["ELO"][0] = acc_elo
+            acc_elo += randint(10, 50)
+            data[i]["ELO"][1] = acc_elo
+            data[i]["ELO"][2] = randint(1000, 1200)
         username = ""
         labels = []
         values = []

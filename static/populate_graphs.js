@@ -16,10 +16,10 @@ pokemon.forEach(mon => {
         move_arr[1] = nrand()
     )
 });
-function constructGraph(moveinfo, graph) {
+function constructGraph(moveinfo, graph, name) {
     const data=google.visualization.arrayToDataTable(moveinfo);
     const colours=['rgb(159, 161, 159)', 'rgb(238, 135, 50)', 'rgb(141, 184, 234)', 'rgb(135, 69, 196)'];
-    const options ={is3D:true, colors:colours};
+    const options ={is3D:true, colors:colours, title:name};
     let chart=new google.visualization.PieChart(graph);
     chart.draw(data, options);
 }
@@ -39,7 +39,7 @@ function drawFunction() {
     for(; count < pokemon_count; count++) {
         const moves = pokemon[count]["moves"];
         constructGraph([["Move", "Movecount"]].concat((moves.map((k, j) =>
-        [moves[j][0], moves[j][1]]))), graphs[count]
+        [moves[j][0], moves[j][1]]))), graphs[count], pokemon[count]["name"]
         );  
     }
 }
