@@ -30,6 +30,11 @@
   /* --bs-btn-hover-border-color: #F0271F !important; */
 }
 
+body, html {
+  height: 100%;
+  margin: 0;
+}
+
 body {
   font-family: Arial, sans-serif;
   /* background-color: rgb(233, 238, 247) !important; */
@@ -139,15 +144,14 @@ body {
   height: auto;
 }
 .glslCanvas {
-  position:absolute;
-  justify-self: center;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
   z-index: -1 !important;
-  width:100%;
-  height:100%;
-  /* height: calc(100% - 7rem); */
+  padding: 0px !important;
   opacity: 0.6;
-  padding:0px !important;
-  padding-bottom: 0rem !important;
 }
 #maintext {
   background: linear-gradient(135deg, #7086f5b2, #ff7b9cb0) ;
