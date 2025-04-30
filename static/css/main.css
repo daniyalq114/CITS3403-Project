@@ -443,12 +443,16 @@ body {
   text-align: center; /* Center the content inside the cell */
   /* display:inline-; */
 }
-
+.sprites.opp {
+  background-color: #ff7b9c80 !important;
+}
 .sprites.opp img {
   background-color: #FF7B9C !important;
   border-radius: 20%;
 }
-
+.sprites.pick {
+  background-color: #90caf977 !important;
+}
 .sprites.pick img {
   background-color: #90caf9 !important;
   border-radius: 20%;
