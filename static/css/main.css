@@ -185,11 +185,13 @@ body {
 }
 .replays-table {
   width: 100%;
-  padding: 0.6rem;
-  border-collapse: collapse;
+  padding: 0;  
+  border-collapse: separate;  
+  border-spacing: 0;  
   border: 1px solid #ccc;
-  border-radius: 4px;
+  border-radius: 4px;  
   font-size: 1rem;
+  overflow: hidden;  
 }
 .replays-table tr:nth-child(odd) {
   background-color: white;
@@ -199,16 +201,13 @@ body {
 }
 .replays-table td {
   padding: 0.6rem;
-  border: 1px solid #ccc;
+  border-bottom: 1px solid #ccc;  
   text-align: left;
   font-size: 1rem;
   height: 2.5rem;
-  overflow: hidden;
 }
-.replays-table td[contenteditable="true"] {
-  outline: none;
-  overflow: hidden;
-  text-overflow: ellipsis;
+.replays-table tr:last-child td {
+  border-bottom: none;
 }
 .generate-btn {
   display: block;
