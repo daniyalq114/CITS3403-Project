@@ -3,36 +3,16 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from random import randint
 import requests
-
+from config import Config
 
 app = Flask(__name__)
 app.secret_key = "dev"  # Needed for flash messages
-app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///app.db"
-app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
-
+app.config.from_object(Config)
 # --- Database setup ---
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
 
-# --- Models ---
-class User(db.Model):
-    username = db.Column(db.String, primary_key=True)
-    email = db.Column(db.String, nullable=False, unique=True)
-    password = db.Column(db.String, nullable=False)
-    matches = db.relationship("Match", backref="user", lazy=True)
-    teams = db.relationship("Team", backref="user", lazy=True)
-
-class Match(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String, db.ForeignKey("user.username"), nullable=False)
-    match_id = db.Column(db.String, nullable=False)
-    showdown_username = db.Column(db.String, nullable=False)
-    match_info = db.Column(db.Text)
-
-class Team(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String, db.ForeignKey("user.username"), nullable=False)
-    team_data = db.Column(db.Text)
+from models import User, Match, Team, Pokemon, Moves
 
 # --- Routes ---
 @app.route("/")
