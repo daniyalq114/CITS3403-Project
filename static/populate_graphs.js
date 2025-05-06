@@ -3,6 +3,7 @@ function nrand() {
     return Math.floor(Math.random() * 5);
 }
 // random data in the format I assume we'll receive
+/*
 pokemon = [
     {"name":"Reshiram", "moves":[["Giga Impact",], ["Light Screen",], ["Protect",], ["Reflect",]]},
     {"name":"Darkrai", "moves":[["Dark Pulse",], ["Hyper Beam",], ["Throat Chop",], ["Thunder Wave",]]}, 
@@ -15,31 +16,34 @@ pokemon.forEach(mon => {
     mon["moves"].forEach(move_arr =>
         move_arr[1] = nrand()
     )
-});
-function constructGraph(moveinfo, graph, name) {
-    const data=google.visualization.arrayToDataTable(moveinfo);
-    const colours=['rgb(159, 161, 159)', 'rgb(238, 135, 50)', 'rgb(141, 184, 234)', 'rgb(135, 69, 196)'];
-    const options ={is3D:true, colors:colours, title:name};
-    let chart=new google.visualization.PieChart(graph);
-    chart.draw(data, options);
-}
-
-// im so sorry for this code
+})*/
 
 if(document.URL.includes("visualise")) {
     google.charts.setOnLoadCallback(drawFunction);
 }
 
-
-var count = 0;
 function drawFunction() {
-    var graphs = document.querySelectorAll(".content > .part3-container > .part3");
+    const moveData = JSON.parse(document.getElementById("move-data").textContent);
+    const container = document.querySelector(".part3-container");
 
-    const pokemon_count = pokemon.length;
-    for(; count < pokemon_count; count++) {
-        const moves = pokemon[count]["moves"];
-        constructGraph([["Move", "Movecount"]].concat((moves.map((k, j) =>
-        [moves[j][0], moves[j][1]]))), graphs[count], pokemon[count]["name"]
-        );  
+    for (const [pokemon, moves] of Object.entries(moveData)) {
+        const graphDiv = document.createElement("div");
+        graphDiv.className = "part3 placeholder-table";
+        container.appendChild(graphDiv);
+
+        const moveArray = [["Move", "Usage"]];
+        for (const [move, count] of Object.entries(moves)) {
+            moveArray.push([move, count]);
+        }
+
+        const data = google.visualization.arrayToDataTable(moveArray);
+        const options = {
+            title: pokemon,
+            is3D: true,
+            colors: ["#90caf9", "#ff6b6b", "#ffcc80", "#a5d6a7"],
+        };
+
+        const chart = new google.visualization.PieChart(graphDiv);
+        chart.draw(data, options);
     }
 }
