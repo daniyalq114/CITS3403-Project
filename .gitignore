@@ -179,3 +179,4 @@ cython_debug/
 app.db
 app.db
 migrations/
+.vscode/
