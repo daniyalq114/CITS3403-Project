@@ -1,21 +1,21 @@
-from flask import Flask, render_template, request, redirect, url_for, flash
+from flask import Flask, render_template, request, redirect, url_for, flash, session
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
-from random import randint
+from werkzeug.security import generate_password_hash, check_password_hash
 import random
 import requests
-
+from random import randint
 
 app = Flask(__name__)
-app.secret_key = "dev"  # Needed for flash messages
+app.secret_key = "dev"
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///app.db"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
-# --- Database setup ---
+# Database setup
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
 
-# --- Models ---
+# Models
 class User(db.Model):
     username = db.Column(db.String, primary_key=True)
     email = db.Column(db.String, nullable=False, unique=True)
@@ -35,7 +35,7 @@ class Team(db.Model):
     username = db.Column(db.String, db.ForeignKey("user.username"), nullable=False)
     team_data = db.Column(db.Text)
 
-# --- Routes ---
+# Routes
 @app.route("/")
 def index():
     return render_template("index.html", active="home")
@@ -46,8 +46,6 @@ def upload():
         username = request.form.get("username", "")
         pokepaste = request.form.get("pokepaste", "")
         replays = request.form.get("replays", "").splitlines()
-
-        # TODO: Save to database (e.g., User, Team, Match)
         flash("Upload received!", "success")
         return redirect(url_for("index"))
     return render_template("upload.html", active="upload")
@@ -57,137 +55,137 @@ def visualise():
     if app.debug:
         data_submitted = True
         usrmon = [
-            {"name":"Reshiram", "moves":[["Giga Impact",], ["Light Screen",], ["Protect",], ["Reflect",]], "iconurl":""},
-            {"name":"Darkrai", "moves":[["Dark Pulse",], ["Hyper Beam",], ["Throat Chop",], ["Thunder Wave",]], "iconurl":""}, 
-            {"name":"Glalie", "moves":[["Avalanche",], ["Blizzard",], ["Body Slam",], ["Chilling Water",]], "iconurl":""}, 
-            {"name":"Deoxys-Attack", "moves":[["Agility",], ["Brick Break",], ["Calm Mind",], ["Dark Pulse",]], "iconurl":""},
-            {"name":"Regigigas", "moves":[["Giga Impact",], ["Hyper Beam",], ["Crush Grip",], ["Thunder",]], "iconurl":""},
-            {"name":"Rayquaza", "moves":[["Giga Impact",], ["Draco Meteor",], ["Dragon Ascent",], ["Meteor Beam",]], "iconurl":""}]
+            {"name":"Reshiram", "moves":[["Giga Impact"], ["Light Screen"], ["Protect"], ["Reflect"]], "iconurl":""},
+            {"name":"Darkrai", "moves":[["Dark Pulse"], ["Hyper Beam"], ["Throat Chop"], ["Thunder Wave"]], "iconurl":""},
+            {"name":"Glalie", "moves":[["Avalanche"], ["Blizzard"], ["Body Slam"], ["Chilling Water"]], "iconurl":""},
+            {"name":"Deoxys-Attack", "moves":[["Agility"], ["Brick Break"], ["Calm Mind"], ["Dark Pulse"]], "iconurl":""},
+            {"name":"Regigigas", "moves":[["Giga Impact"], ["Hyper Beam"], ["Crush Grip"], ["Thunder"]], "iconurl":""},
+            {"name":"Rayquaza", "moves":[["Giga Impact"], ["Draco Meteor"], ["Dragon Ascent"], ["Meteor Beam"]], "iconurl":""}
+        ]
         data = [
             {
-                "win":True, 
-                "enemyusr":{"name":"greg", "search_request":"google.com"},
-                "replay":{"name":"replay", "search_request":"google.com"} ,
-                "oppteam":["Rellor","Eiscue","Swablu","Aggron","Doduo","Applin"], 
-                "usrpicks":[], 
-                "opppicks":[], 
-                "Terastallize":[],
-                "ELO":[0]*3, 
-                "OTS":True,
+                "win": True,
+                "enemyusr": {"name": "greg", "search_request": "google.com"},
+                "replay": {"name": "replay", "search_request": "google.com"},
+                "oppteam": ["Rellor", "Eiscue", "Swablu", "Aggron", "Doduo", "Applin"],
+                "usrpicks": [],
+                "opppicks": [],
+                "Terastallize": [],
+                "ELO": [0]*3,
+                "OTS": True
             },
             {
-                "win":True, 
-                "enemyusr":{"name":"ash ketchup", "search_request":"google.com"},
-                "replay":{"name":"replay", "search_request":"google.com"}, 
-                "oppteam":["Pancham","Jirachi","Luxio","Blissey","Toucannon","Pansage"],
-                "usrpicks":[], 
-                "opppicks":[], 
-                "Terastallize":[],
-                "ELO":[0]*3, 
-                "OTS":True,
+                "win": True,
+                "enemyusr": {"name": "ash ketchup", "search_request": "google.com"},
+                "replay": {"name": "replay", "search_request": "google.com"},
+                "oppteam": ["Pancham", "Jirachi", "Luxio", "Blissey", "Toucannon", "Pansage"],
+                "usrpicks": [],
+                "opppicks": [],
+                "Terastallize": [],
+                "ELO": [0]*3,
+                "OTS": True
             },
             {
-                "win":True, 
-                "enemyusr":{"name":"obama", "search_request":"google.com"}, 
-                "replay":{"name":"replay", "search_request":"google.com"},
-                "oppteam":["Arbok","Klang","Kingdra","Machop","Panpour","Garchomp"],
-                "usrpicks":[], 
-                "opppicks":[], 
-                "Terastallize":[],
-                "ELO":[0]*3, 
-                "OTS":True,
+                "win": True,
+                "enemyusr": {"name": "obama", "search_request": "google.com"},
+                "replay": {"name": "replay", "search_request": "google.com"},
+                "oppteam": ["Arbok", "Klang", "Kingdra", "Machop", "Panpour", "Garchomp"],
+                "usrpicks": [],
+                "opppicks": [],
+                "Terastallize": [],
+                "ELO": [0]*3,
+                "OTS": True
             }
         ]
         acc_elo = 1000
-        # random entries
         for mon in usrmon:
-            url = f"https://pokeapi.co/api/v2/pokemon/{mon['name'].lower()}/"
-            response = requests.get(url)
-            response.raise_for_status()
-            jsondata = response.json()
-            mon["iconurl"] = jsondata["sprites"]["front_default"]  
-            
-        for i in range(2, -1, -1):  # Fix range to include all indices
-            temp = [pokemon["iconurl"] for pokemon in usrmon]  # Extract only the icon URLs
-            data[i]["usrpicks"] = [temp.pop(randint(0, len(temp) - 1)) for _ in range(4)]
-            # Populate oppteam with sprite URLs
-            oppteam_sprites = []
+            try:
+                url = f"https://pokeapi.co/api/v2/pokemon/{mon['name'].lower()}/"
+                jsondata = requests.get(url).json()
+                mon["iconurl"] = jsondata["sprites"]["front_default"]
+            except:
+                mon["iconurl"] = ""
+
+        for i in range(2, -1, -1):
+            temp = [m["iconurl"] for m in usrmon]
+            data[i]["usrpicks"] = [temp.pop(randint(0, len(temp)-1)) for _ in range(4)]
             default_sprite = "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/0.png"
+            oppteam_sprites = []
             for name in data[i]["oppteam"]:
                 try:
-                    url = f"https://pokeapi.co/api/v2/pokemon/{name.lower()}/"
-                    response = requests.get(url)
-                    response.raise_for_status()
-                    jsondata = response.json()
+                    jsondata = requests.get(f"https://pokeapi.co/api/v2/pokemon/{name.lower()}/").json()
                     oppteam_sprites.append(jsondata["sprites"]["front_default"])
-                except requests.exceptions.RequestException:
+                except:
                     oppteam_sprites.append(default_sprite)
             data[i]["oppteam"] = oppteam_sprites
             temp = oppteam_sprites.copy()
             data[i]["opppicks"] = [temp.pop(randint(0, len(temp) - 1)) for _ in range(4)]
-            # generate elo
             data[i]["ELO"][0] = acc_elo
             acc_elo += randint(10, 50)
             data[i]["ELO"][1] = acc_elo
             data[i]["ELO"][2] = randint(1000, 1200)
-        username = ""
-        labels = []
-        values = []
-        return render_template(
-            "visualise.html",
-            active="visualise",
-            data_submitted=data_submitted,
-            username=username,
-            labels=labels,
-            values=values, 
-            games=data
-        )
-        
-    username = ""
+
+        return render_template("visualise.html", active="visualise", data_submitted=True, username="", labels=[], values=[], games=data)
+
     if request.method == "POST":
         username = request.form.get("username", "").strip()
         data_submitted = True
-
-        # TODO: Load actual match data from DB
         labels = ["Win", "Loss", "Draw"]
         values = [random.randint(1, 10) for _ in labels]
     else:
+        data_submitted = False
+        username = ""
         labels = []
         values = []
 
-    return render_template(
-        "visualise.html",
-        active="visualise",
-        data_submitted=data_submitted,
-        username=username,
-        labels=labels,
-        values=values
-    )
+    return render_template("visualise.html", active="visualise", data_submitted=data_submitted, username=username, labels=labels, values=values)
 
 @app.route("/network", methods=["GET", "POST"])
 def network():
-    users = ["Ash", "Misty", "Brock", "May", "Dawn", "Gary"]  # TODO: Replace with User.query.all()
-
+    users = [u.username for u in User.query.all()]
     if request.method == "POST":
         target = request.form.get("search_user", "")
-        # TODO: send friend request to target
         flash(f"Friend request sent to {target}", "success")
         return redirect(url_for("network"))
-
     return render_template("network.html", active="network", users=users)
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
-    # stub for future implementation
+    if request.method == "POST":
+        username = request.form["username"]
+        password = request.form["password"]
+        user = User.query.filter_by(username=username).first()
+        if user and check_password_hash(user.password, password):
+            session["user"] = user.username
+            flash("Logged in successfully!", "success")
+            return redirect(url_for("index"))
+        else:
+            flash("Invalid username or password.", "danger")
+            return redirect(url_for("login"))
     return render_template("login.html", active="login")
 
 @app.route("/signup", methods=["GET", "POST"])
 def signup():
     if request.method == "POST":
-        # TODO: Save new user to DB
+        username = request.form["username"]
+        email = request.form["email"]
+        password = request.form["password"]
+        if User.query.filter_by(username=username).first():
+            flash("Username already exists.", "danger")
+            return redirect(url_for("signup"))
+        hashed_pw = generate_password_hash(password)
+        new_user = User(username=username, email=email, password=hashed_pw)
+        db.session.add(new_user)
+        db.session.commit()
         flash("Account created! You can now log in.", "success")
         return redirect(url_for("login"))
     return render_template("signup.html", active="signup")
+
+@app.route("/logout")
+def logout():
+    session.pop("user", None)
+    flash("Logged out.", "info")
+    return redirect(url_for("index"))
 
 if __name__ == "__main__":
     app.run(debug=True)
