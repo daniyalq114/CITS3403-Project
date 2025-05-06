@@ -22,6 +22,9 @@
     </form>
 
     {% if data_submitted %}
+      <h2>Username: {{ username }}</h2>
+      <p>PokéPaste: <a href="{{ pokepaste }}" target="_blank">{{ pokepaste }}</a></p>
+
       <!-- Part 1 -->
       <p class="section-label">Part 1: Replay Record</p>
       <div class="table-responsive">
@@ -52,52 +55,47 @@
           <tbody>
             {% for game in games %}
             <tr>
+              <!-- Game number -->
+              <td>{{ game.id }}</td>
+              
               <!-- Win/Loss -->
               <td class="{{ 'win' if game.win else 'loss' }}">
                 <b>{{ 'Win' if game.win else 'Loss' }}</b>
               </td>
 
-              <!-- Enemy User -->
-              <td>
-                <a href="{{ game.enemyusr.search_request }}">{{ game.enemyusr.name }}</a>
-              </td>
-
               <!-- Replay Link -->
               <td>
-                <a href="{{ game.replay.search_request }}">{{ game.replay.name }}</a>
+                <a href="{{ game.replay.search_request }}" target="_blank">View Replay</a>
               </td>
 
               <!-- Opposing Team -->
               <td class="sprites opp">
-                {% for sprite in game.oppteam %}
-                  <img src="{{ sprite }}" alt="sprite">
+                {% for pokemon in game.oppteam %}
+                  <span class="pokemon-name">{{ pokemon }}</span>
+                  {% if not loop.last %}, {% endif %}
                 {% endfor %}
               </td>
 
               <!-- Your Picks -->
               <td class="sprites pick">
-                {% for sprite in game.usrpicks %}
-                  <img src="{{ sprite }}" alt="sprite">
+                {% for pokemon in game.usrpicks %}
+                  <span class="pokemon-name">{{ pokemon }}</span>
+                  {% if not loop.last %}, {% endif %}
                 {% endfor %}
               </td>
+
               <!-- Their Picks -->
               <td class="sprites pick">
-                {% for sprite in game.opppicks %}
-                  <img src="{{ sprite }}" alt="sprite">
+                {% for pokemon in game.opppicks %}
+                  <span class="pokemon-name">{{ pokemon }}</span>
+                  {% if not loop.last %}, {% endif %}
                 {% endfor %}
               </td>
-              <!-- Terastallize -->
-              <td>
-                {{ 'Yes' if game.Terastallize[0] else 'No' }}
-              </td>
-              <td>
-                {{ 'Yes' if game.Terastallize[1] else 'No' }}
-              </td>
 
-              <!-- OTS -->
+              <!-- Rest of the columns -->
+              <td>{{ 'Yes' if game.Terastallize[0] else 'No' }}</td>
+              <td>{{ 'Yes' if game.Terastallize[1] else 'No' }}</td>
               <td>{{ 'Yes' if game.OTS else 'No' }}</td>
-
-              <!-- ELO -->
               <td>{{ game.ELO[1] }} <b>↑</b> {{ game.ELO[0] }}</td>
               <td>{{ game.ELO[2] }}</td>
             </tr>
@@ -116,13 +114,22 @@
       <!-- Part 3 -->
       <p class="section-label">Part 3: Move Usage</p>
       <div class="part3-container">
-        <div class="part3 placeholder-table"></div>
-        <div class="part3 placeholder-table"></div>
-        <div class="part3 placeholder-table"></div>
-        <div class="part3 placeholder-table"></div>
-        <div class="part3 placeholder-table"></div>
-        <div class="part3 placeholder-table"></div>
+        {% for pokemon, moves in move_data.items() %}
+          <div class="part3 placeholder-table">
+            <h3>{{ pokemon }}</h3>
+            <ul>
+              {% for move, count in moves.items() %}
+                <li>{{ move }}: {{ count }}</li>
+              {% endfor %}
+            </ul>
+          </div>
+        {% endfor %}
       </div>
+
+      <!-- Hidden JSON data for JavaScript -->
+      <script id="move-data" type="application/json">
+        {{ move_data | tojson }}
+      </script>
     {% endif %}
   </div>
 {% endblock %}
