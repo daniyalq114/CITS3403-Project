@@ -176,3 +176,6 @@ cython_debug/
 
 # More (annoying) stuff
 .DS_Store
+app.db
+app.db
+migrations/
