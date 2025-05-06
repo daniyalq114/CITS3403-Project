@@ -22,125 +22,73 @@ def index():
 @app.route("/upload", methods=["GET", "POST"])
 def upload():
     if request.method == "POST":
-        username = request.form.get("username", "")
-        pokepaste = request.form.get("pokepaste", "")
-        replays = request.form.get("replays", "").splitlines()
+        #TODO: change this into database later
+        # Read input from the form
+        username = request.form.get("username", "").strip()
+        pokepaste = request.form.get("pokepaste", "").strip()
+        replays = [request.form.get(f"replay_{i}", "").strip() for i in range(40)]
+        replays = [replay for replay in replays if replay]  # Filter out empty inputs
 
-        # TODO: Save to database (e.g., User, Team, Match)
-        flash("Upload received!", "success")
-        return redirect(url_for("index"))
+        # Store the data in the session
+        session["username"] = username
+        session["pokepaste"] = pokepaste
+        session["replays"] = replays
+
+        # Redirect to the visualise page
+        return redirect(url_for("visualise"))
+
     return render_template("upload.html", active="upload")
 
 @app.route("/visualise", methods=["GET", "POST"])
 def visualise():
-    if app.debug:
-        data_submitted = True
-        usrmon = [
-            {"name":"Reshiram", "moves":[["Giga Impact",], ["Light Screen",], ["Protect",], ["Reflect",]], "iconurl":""},
-            {"name":"Darkrai", "moves":[["Dark Pulse",], ["Hyper Beam",], ["Throat Chop",], ["Thunder Wave",]], "iconurl":""}, 
-            {"name":"Glalie", "moves":[["Avalanche",], ["Blizzard",], ["Body Slam",], ["Chilling Water",]], "iconurl":""}, 
-            {"name":"Deoxys-Attack", "moves":[["Agility",], ["Brick Break",], ["Calm Mind",], ["Dark Pulse",]], "iconurl":""},
-            {"name":"Regigigas", "moves":[["Giga Impact",], ["Hyper Beam",], ["Crush Grip",], ["Thunder",]], "iconurl":""},
-            {"name":"Rayquaza", "moves":[["Giga Impact",], ["Draco Meteor",], ["Dragon Ascent",], ["Meteor Beam",]], "iconurl":""}]
-        data = [
-            {
-                "win":True, 
-                "enemyusr":{"name":"greg", "search_request":"google.com"},
-                "replay":{"name":"replay", "search_request":"google.com"} ,
-                "oppteam":["Rellor","Eiscue","Swablu","Aggron","Doduo","Applin"], 
-                "usrpicks":[], 
-                "opppicks":[], 
-                "Terastallize":[],
-                "ELO":[0]*3, 
-                "OTS":True,
-            },
-            {
-                "win":True, 
-                "enemyusr":{"name":"ash ketchup", "search_request":"google.com"},
-                "replay":{"name":"replay", "search_request":"google.com"}, 
-                "oppteam":["Pancham","Jirachi","Luxio","Blissey","Toucannon","Pansage"],
-                "usrpicks":[], 
-                "opppicks":[], 
-                "Terastallize":[],
-                "ELO":[0]*3, 
-                "OTS":True,
-            },
-            {
-                "win":True, 
-                "enemyusr":{"name":"obama", "search_request":"google.com"}, 
-                "replay":{"name":"replay", "search_request":"google.com"},
-                "oppteam":["Arbok","Klang","Kingdra","Machop","Panpour","Garchomp"],
-                "usrpicks":[], 
-                "opppicks":[], 
-                "Terastallize":[],
-                "ELO":[0]*3, 
-                "OTS":True,
-            }
-        ]
-        acc_elo = 1000
-        # random entries
-        for mon in usrmon:
-            url = f"https://pokeapi.co/api/v2/pokemon/{mon['name'].lower()}/"
-            response = requests.get(url)
-            response.raise_for_status()
-            jsondata = response.json()
-            mon["iconurl"] = jsondata["sprites"]["front_default"]  
-            
-        for i in range(2, -1, -1):  # Fix range to include all indices
-            temp = [pokemon["iconurl"] for pokemon in usrmon]  # Extract only the icon URLs
-            data[i]["usrpicks"] = [temp.pop(randint(0, len(temp) - 1)) for _ in range(4)]
-            # Populate oppteam with sprite URLs
-            oppteam_sprites = []
-            default_sprite = "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/0.png"
-            for name in data[i]["oppteam"]:
-                try:
-                    url = f"https://pokeapi.co/api/v2/pokemon/{name.lower()}/"
-                    response = requests.get(url)
-                    response.raise_for_status()
-                    jsondata = response.json()
-                    oppteam_sprites.append(jsondata["sprites"]["front_default"])
-                except requests.exceptions.RequestException:
-                    oppteam_sprites.append(default_sprite)
-            data[i]["oppteam"] = oppteam_sprites
-            temp = oppteam_sprites.copy()
-            data[i]["opppicks"] = [temp.pop(randint(0, len(temp) - 1)) for _ in range(4)]
-            # generate elo
-            data[i]["ELO"][0] = acc_elo
-            acc_elo += randint(10, 50)
-            data[i]["ELO"][1] = acc_elo
-            data[i]["ELO"][2] = randint(1000, 1200)
-        username = ""
-        labels = []
-        values = []
-        return render_template(
-            "visualise.html",
-            active="visualise",
-            data_submitted=data_submitted,
-            username=username,
-            labels=labels,
-            values=values, 
-            games=data
-        )
-        
-    username = ""
-    if request.method == "POST":
-        username = request.form.get("username", "").strip()
-        data_submitted = True
+    username = session.get("username", "")
+    pokepaste = session.get("pokepaste", "")
+    replay_urls = session.get("replays", [])
+    data_submitted = bool(replay_urls)
+    games = []
+    move_data = {}
 
-        # TODO: Load actual match data from DB
-        labels = ["Win", "Loss", "Draw"]
-        values = [random.randint(1, 10) for _ in labels]
-    else:
-        labels = []
-        values = []
+    if data_submitted:
+        # Parse PokéPaste data
+        pokepaste_parser = PokePasteParser()
+        pokemon_data = pokepaste_parser.parse_pokepaste(pokepaste)
+        pokepaste_parser.populate_sprites()
+
+        # Parse replays
+        for replay_url in replay_urls:
+            try:
+                response = requests.get(replay_url)
+                response.raise_for_status()
+                parser = ReplayHTMLParser()
+                parser.feed(response.text)
+
+                # Get formatted game data
+                game_data = parser.get_formatted_data(username)
+                game_data["replay"]["search_request"] = replay_url
+                games.append(game_data)
+
+                # Update move data
+                for pokemon, moves in parser.move_usage.items():
+                    if pokemon not in move_data:
+                        move_data[pokemon] = {}
+                    for move, count in moves.items():
+                        if move not in move_data[pokemon]:
+                            move_data[pokemon][move] = 0
+                        move_data[pokemon][move] += count
+
+            except Exception as e:
+                flash(f"Failed to process replay {replay_url}: {str(e)}", "error")
+                continue
 
     return render_template(
         "visualise.html",
         active="visualise",
         data_submitted=data_submitted,
         username=username,
-        labels=labels,
-        values=values
+        pokepaste=pokepaste,
+        games=games,
+        move_data=move_data,
+        pokemon_data=pokemon_data if data_submitted else []
     )
 
 @app.route("/network", methods=["GET", "POST"])
