@@ -71,5 +71,26 @@
   <main class="content">
     {% block content %}{% endblock %}
   </main>
+
+  <!-- Theme-toggle script -->
+  <script>
+    (function(){
+      const btn  = document.getElementById('theme-toggle');
+      const root = document.documentElement;
+
+      // Apply saved theme (or default to light)
+      const saved = localStorage.getItem('theme') || 'light';
+      root.setAttribute('data-theme', saved);
+      btn.textContent = saved === 'dark' ? '☀️' : '🌙';
+
+      // Toggle on click
+      btn.onclick = () => {
+        const next = root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+        root.setAttribute('data-theme', next);
+        localStorage.setItem('theme', next);
+        btn.textContent = next === 'dark' ? '☀️' : '🌙';
+      };
+    })();
+  </script>
 </body>
 </html>
