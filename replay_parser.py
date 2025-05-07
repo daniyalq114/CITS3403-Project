@@ -29,6 +29,7 @@ class Pokemon:
 class Player:
     name: str = ""
     team: dict = field(default_factory=dict)
+    elo: list = field(default_factory=list)
 
 class ReplayLogParser:
     def __init__(self, URL):
@@ -88,6 +89,32 @@ class ReplayLogParser:
             line = next(log, None)
             if line:
                 line = line.strip('|').split('|')
+        # win line met
+        self.winner = line[1]
+        i = 0
+
+        line = next(log).strip('|').split('|')
+        while line != None:
+            if line[0] == 'raw':
+                if i == 0:
+                    i += 1
+                    line = next(log, None)
+                    continue
+                else:
+                    # finding and setting the current elo
+                    temp = line[1].find(" rating: ") + 9 # index of the current elo
+                    cur_elo_end_index = line[1].find(" ", temp)
+                    cur_elo = line[1][temp:cur_elo_end_index]
+
+                    temp = line[1].find("<strong>") + 8
+                    new_elo_end_index = line[1].find("</strong>", temp)
+                    new_elo = line[1][temp:new_elo_end_index]
+                    self.players[f"p{i}"].elo = [cur_elo, new_elo]
+                    i+=1
+            line = next(log, None)
+            if line:
+                line = line.strip('|').split('|')
+
     
     def getPlayerData(self, log):
         """Retrieves initial pokemon data from `log`"""
@@ -132,10 +159,12 @@ replay = ReplayLogParser('https://replay.pokemonshowdown.com/oumonotype-82345404
 # import parser in other python file responsible for 
 # writing to database
 print("Player 1:", replay.players['p1'].name)
+print("ELO:", replay.players['p1'].elo)
 for pokemon in replay.players['p1'].team:
     print(f"{pokemon}, {replay.players['p1'].team[pokemon]}")
 print()
 print("Player 2:", replay.players['p2'].name)
+print("ELO:", replay.players['p2'].elo)
 for pokemon in replay.players['p2'].team:
     print(f"{pokemon}, {replay.players['p2'].team[pokemon]}")
 print()
