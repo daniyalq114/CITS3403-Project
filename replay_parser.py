@@ -17,118 +17,95 @@ Usage Example:
         for action in turn.actions:
             print("  ", action)
 """
+import requests
+from dataclasses import dataclass, field
 
-from html.parser import HTMLParser
+@dataclass
+class Pokemon:
+    moves: dict = field(default_factory=dict)
+    wins: int = 0
 
+@dataclass
 class Player:
-    def __init__(self, name="", team=None):
-        self.name = name
-        self.team = team if team else []
+    name: str = ""
+    team: dict = field(default_factory=dict)
 
-class Turn:
-    def __init__(self, number):
-        self.number = number
-        self.actions = []
-
-class ReplayData:
-    def __init__(self):
-        self.title = ""
-        self.player1 = Player()
-        self.player2 = Player()
-        self.turns = []
-        self.winner = ""
-        self.raw_log = []
-
-class ReplayHTMLParser(HTMLParser):
-    def __init__(self):
-        super().__init__()
-        self.recording_title = False
-        self.in_script_tag = False
-        self.replay = ReplayData()
-        self.log_buffer = []
-        self.move_usage = {}
-        self.team1 = []
-        self.team2 = []
-        self.picked_pokemon = {'p1': [], 'p2': []}
+class ReplayLogParser:
+    def __init__(self, URL):
+        self.players = {"p1": Player(), "p2": Player()}  
+        self.winner = None # to be updated after win condition is satisfied
+        #TODO
+        # mostly to be returned to intermediary database-communicating class
+        self.replay_url = URL
+        # this stuff is handled once main loop terminates
         self.elo_data = {'p1': [0, 0, 0], 'p2': [0, 0, 0]}
         self.terastallize = {'p1': False, 'p2': False}
 
-    def handle_starttag(self, tag, attrs):
-        if tag == "title":
-            self.recording_title = True
-        if tag == "script":
-            for name, value in attrs:
-                if name == "class" and "battle-log-data" in value:
-                    self.in_script_tag = True
+        response = requests.get(f"{URL}.log")
+        response.raise_for_status()
+        # perhaps stupid. Sorry.
+        log = (line.decode('utf-8') for line in response.iter_lines()) 
+        self.parse_loop(log)
+    
+    def parse_loop(self, log):
+        # log = (line.decode('utf-8') for line in log)  # Decode all lines at once
+        active_pokemon = [None, None]  # p1, p2
 
-    def handle_endtag(self, tag):
-        if tag == "title":
-            self.recording_title = False
-        if tag == "script" and self.in_script_tag:
-            self.in_script_tag = False
-            self._parse_script_data("\n".join(self.log_buffer))
-            self.log_buffer.clear()
+        # Initialize players before the game starts
+        self.getPlayerData(log)
 
-    def handle_data(self, data):
-        if self.recording_title:
-            self.replay.title = data.strip()
-        if self.in_script_tag:
-            self.log_buffer.append(data)
+        line = next(log, None)
+        if line:
+            line = line.strip('|').split('|')  # First 'turn' has just been encountered
 
-    def _parse_script_data(self, script_data):
-        current_turn = None
-        for line in script_data.strip().splitlines():
-            self.replay.raw_log.append(line.strip())
-            parts = line.split('|')
-            
-            # Track teams and picks
-            if line.startswith('|poke|p1|'):
-                pokemon = parts[3].split(',')[0].strip()
-                if pokemon not in self.team1:
-                    self.team1.append(pokemon)
-                    self.replay.player1.team.append(pokemon)
-            elif line.startswith('|poke|p2|'):
-                pokemon = parts[3].split(',')[0].strip()
-                if pokemon not in self.team2:
-                    self.team2.append(pokemon)
-                    self.replay.player2.team.append(pokemon)
-            elif line.startswith('|switch|') or line.startswith('|drag|'):
-                side = 'p1' if 'p1a:' in parts[2] else 'p2'
-                pokemon = parts[3].split(',')[0].strip()
-                if pokemon not in self.picked_pokemon[side]:
-                    self.picked_pokemon[side].append(pokemon)
+        # Main loop
+        while line and line[0] != 'win':
+            match line[0]: # logic for each case could probably move into different funcs
+                case 'switch': 
+                    player = line[1][1]  # Extract player number (e.g., 'p1' -> '1')
+                    pokemon_name = line[2].split(',')[0].strip()  # Extract and clean Pokémon name
+                    if pokemon_name:  # Ensure the name is valid
+                        self.players[f'p{player}'].team.setdefault(pokemon_name, Pokemon()).active = True
+                        active_pokemon[int(player) - 1] = pokemon_name  # Update active Pokémon
 
-            # Track moves
-            elif line.startswith('|move|'):
-                pokemon = parts[2].split(':')[1].strip()
-                move = parts[3].strip()
-                if pokemon not in self.move_usage:
-                    self.move_usage[pokemon] = {}
-                if move not in self.move_usage[pokemon]:
-                    self.move_usage[pokemon][move] = 0
-                self.move_usage[pokemon][move] += 1
+                case 'move':
+                    player = line[1][1]
+                    pokemon_name = active_pokemon[int(player) - 1]
+                    if pokemon_name:  # Ensure the active Pokémon is valid
+                        move_name = line[2]
+                        pokemon = self.players[f'p{player}'].team.setdefault(pokemon_name, Pokemon())
+                        pokemon.moves[move_name] = pokemon.moves.get(move_name, 0) + 1
 
-            # Track winner
-            elif line.startswith('|win|'):
-                self.replay.winner = parts[2]
+                case 'faint':
+                    fainted_player = line[1][1]
+                    fainted_pokemon = line[1][line[1].find(": "):] #deals with formatting
+                    if fainted_pokemon:
+                        attacker_player = 1 if fainted_player == '2' else 2
+                        attacker_pokemon = active_pokemon[attacker_player - 1]
+                        if attacker_pokemon:  # Ensure the attacker Pokémon is valid
+                            self.players[f'p{attacker_player}'].team[attacker_pokemon].wins += 1
+            # Read the next line
+            line = next(log, None)
+            if line:
+                line = line.strip('|').split('|')
+    
+    def getPlayerData(self, log):
+        """Retrieves initial pokemon data from `log`"""
+        line = next(log).strip('|').split('|')
+        while line[0] != 'start':
+            if line[0] == 'player':
+                self.players[line[1]].name = line[2]
 
-            # Player names
-            elif line.startswith("|player|p1|"):
-                self.replay.player1.name = parts[3]
-            elif line.startswith("|player|p2|"):
-                self.replay.player2.name = parts[3]
+            elif line[0] == 'poke':
+                pokemon_name = line[2].split(',')[0].strip()  # Extract and clean Pokémon name
+                if pokemon_name:  # Ensure the name is not empty or None
+                    self.players[line[1]].team.setdefault(pokemon_name, Pokemon())
 
-            # Turns and actions
-            elif line.startswith("|turn|"):
-                turn_num = int(parts[2])
-                current_turn = Turn(turn_num)
-                self.replay.turns.append(current_turn)
-            elif line.startswith("|") and current_turn:
-                current_turn.actions.append(line)
-
+            line = next(log).strip('|').split('|')
+    
     def get_formatted_data(self, username):
         """Return formatted game data for the given username"""
-        is_player1 = self.replay.player1.name.lower() == username.lower()
+        is_player1 = self.players['p1'].name.lower() == username.lower()
         
         return {
             "win": self.replay.winner.lower() == username.lower(),
@@ -151,9 +128,15 @@ class ReplayHTMLParser(HTMLParser):
             "OTS": True  # Add logic to determine OTS if available
         }
 
-def parse_replay_file(filepath):
-    with open(filepath, 'r', encoding='utf-8') as file:
-        content = file.read()
-    parser = ReplayHTMLParser()
-    parser.feed(content)
-    return parser.replay
+replay = ReplayLogParser('https://replay.pokemonshowdown.com/oumonotype-82345404')
+# import parser in other python file responsible for 
+# writing to database
+print("Player 1:", replay.players['p1'].name)
+for pokemon in replay.players['p1'].team:
+    print(f"{pokemon}, {replay.players['p1'].team[pokemon]}")
+print()
+print("Player 2:", replay.players['p2'].name)
+for pokemon in replay.players['p2'].team:
+    print(f"{pokemon}, {replay.players['p2'].team[pokemon]}")
+print()
+print("Winner:", replay.winner)

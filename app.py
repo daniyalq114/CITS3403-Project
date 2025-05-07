@@ -127,6 +127,9 @@ def signup():
         if User.query.filter_by(username=username).first():
             flash("Username already exists.", "danger")
             return redirect(url_for("signup"))
+        if User.query.filter_by(email=email).first():
+            flash("Email already in use.", "danger")
+            return redirect(url_for("signup"))
         hashed_pw = generate_password_hash(password)
         new_user = User(username=username, email=email, password=hashed_pw)
         db.session.add(new_user)
