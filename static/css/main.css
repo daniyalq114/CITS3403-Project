@@ -511,3 +511,16 @@ body {
   max-height: 40px;
   display: inline-block;
 }
+
+/* Welcome message */
+.welcome-message {
+    margin: 1rem 0;
+    padding: 0.5rem;
+    color: var(--primary-color);
+    font-family: "Nunito", sans-serif;
+}
+
+.welcome-message h3 {
+    margin: 0;
+    font-size: 1.5rem;
+}
