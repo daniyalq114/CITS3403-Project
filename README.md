@@ -42,13 +42,21 @@ Version Control: Git and GitHub for collaborative development
 
 ### Running the test site
 1. Navigate to the directory you'd like to store LugiAnalytics, for instance:
-`cd Desktop/dev/`
+```shell
+cd Desktop/dev/
+```
 2. Clone the repository:
-`git clone https://github.com/daniyalq114/CITS3403-Project.git`
+```shell
+git clone https://github.com/daniyalq114/CITS3403-Project.git
+```
 3. Navigate to the project directory:
-`cd CITS3403-Project/`
+```shell
+cd CITS3403-Project/
+```
 4. Construct a virtual environment:
-`python3 -m venv lugi-venv`
+```shell
+python3 -m venv lugi-venv
+```
 5. Activate the environment: 
     | Platform | Shell      | Command                                 |
     |----------|------------|-----------------------------------------|
@@ -59,8 +67,16 @@ Version Control: Git and GitHub for collaborative development
     | Windows  | cmd.exe    | `source lugi-venv\Scripts\activate.bat` |
     |          | Powershell | `source lugi-venv\Scripts\Activate.ps1` |
 6. Install dependencies
-`pip install -r requirements.txt`
-7. Run LugiAnalytics
+```shell
+pip install -r requirements.txt
+```
+7. Set up the database
+```shell
+flask db init # initialise database
+flask db migrate # set up the database to follow schema in models.py
+flask db upgrade # apply the migration to the database
+```
+8. Run LugiAnalytics
 `flask run`
 Open the returned url, e.g. for `* Running on http://127.0.0.1:5000` open `http://127.0.0.1:5000` in your browser. 
 
