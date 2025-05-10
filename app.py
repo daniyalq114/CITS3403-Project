@@ -142,6 +142,9 @@ def signup():
         if User.query.filter_by(username=username).first():
             flash("Username already exists.", "danger")
             return redirect(url_for("signup"))
+        if User.query.filter_by(email=email).first():
+            flash("Email is already registered.", "danger")
+            return redirect(url_for("signup"))
         new_user = User(username=username, email=email)
         new_user.set_password(password)
         db.session.add(new_user)
