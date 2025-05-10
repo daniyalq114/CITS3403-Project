@@ -1,5 +1,6 @@
 from flask_login import UserMixin
-from app import db
+from werkzeug.security import generate_password_hash, check_password_hash
+from extensions import db
 
 class User(UserMixin, db.Model):
     username = db.Column(db.String, primary_key=True)
@@ -7,6 +8,12 @@ class User(UserMixin, db.Model):
     password = db.Column(db.String, nullable=False)
     matches = db.relationship("Match", backref="user", lazy=True)
     teams = db.relationship("Team", backref="user", lazy=True)
+
+    def set_password(self, password):
+        self.password = generate_password_hash(password, method='pbkdf2:sha256')
+
+    def check_password(self, password):
+        return check_password_hash(self.password, password)
 
     def get_id(self):
         return self.username  # Return username instead of id

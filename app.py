@@ -1,22 +1,22 @@
 from flask import Flask, render_template, request, redirect, url_for, flash, session
-from flask_sqlalchemy import SQLAlchemy
-from flask_migrate import Migrate
+from config import Config
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
 from flask_wtf import CSRFProtect
-from werkzeug.security import generate_password_hash, check_password_hash
 import random
 import requests
 from random import randint
 import requests
-from config import Config
+from extensions import db, migrate
+from models import User
 
 app = Flask(__name__)
 app.config.from_object(Config)
 
 # --- Database setup ---
-db = SQLAlchemy(app)
-migrate = Migrate(app, db)
+db.init_app(app)
+migrate.init_app(app, db)
 
+# --- Flask login setup ---
 login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = "login"
@@ -124,7 +124,7 @@ def login():
         username = request.form["username"]
         password = request.form["password"]
         user = User.query.filter_by(username=username).first()
-        if user and check_password_hash(user.password, password):
+        if user and user.check_password(password):
             login_user(user)  # Flask-Login handles the session
             flash("Logged in successfully!", "success")
             return redirect(url_for("index"))
@@ -142,8 +142,8 @@ def signup():
         if User.query.filter_by(username=username).first():
             flash("Username already exists.", "danger")
             return redirect(url_for("signup"))
-        hashed_pw = generate_password_hash(password, method='pbkdf2:sha256')
-        new_user = User(username=username, email=email, password=hashed_pw)
+        new_user = User(username=username, email=email)
+        new_user.set_password(password)
         db.session.add(new_user)
         db.session.commit()
         flash("Account created! You can now log in.", "success")

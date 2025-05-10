@@ -103,8 +103,6 @@ Version Control: Git and GitHub for collaborative development
 3. Apply the migration
 `flask db upgrade`
 
-4. Run the app
-`flask run`
 
 
 ### Reset migrations and database (DEV ONLY)
@@ -123,6 +121,3 @@ Version Control: Git and GitHub for collaborative development
 
 5. Apply the migration to create the new database
 `flask db upgrade`
-
-6. Run the app
-`flask run`
