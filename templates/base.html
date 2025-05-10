@@ -41,28 +41,43 @@
           <li class="nav-item">
             <a class="nav-link {% if active=='home' %}active{% endif %}" href="{{ url_for('index') }}">Home</a>
           </li>
-          <li class="nav-item">
-            <a class="nav-link {% if active=='upload' %}active{% endif %}" href="{{ url_for('upload') }}">Upload</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link {% if active=='visualise' %}active{% endif %}" href="{{ url_for('visualise') }}">Visualise</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link {% if active=='network' %}active{% endif %}" href="{{ url_for('network') }}">Network</a>
-          </li>
-          <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-              Account
-            </a>
-            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdownMenuLink">
-              <li class="dropdown-item nav-item">
-                <a class="nav-link {% if active=='login' %}active{% endif %}" href="{{ url_for('login') }}">Log In</a>
-              </li>
-              <li class="dropdown-item nav-item">
-                <a class="nav-link {% if active=='signup' %}active{% endif %}" href="{{ url_for('signup') }}">Sign Up</a>
-              </li>
-            </ul>
-          </li>
+          {% if current_user.is_authenticated %}
+            <li class="nav-item">
+              <a class="nav-link {% if active=='upload' %}active{% endif %}" href="{{ url_for('upload') }}">Upload</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link {% if active=='visualise' %}active{% endif %}" href="{{ url_for('visualise') }}">Visualise</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link {% if active=='network' %}active{% endif %}" href="{{ url_for('network') }}">Network</a>
+            </li>
+          {% endif %}
+          {% if current_user.is_authenticated %}
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                {{ current_user.username }}
+              </a>
+              <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdownMenuLink">
+                <li class="dropdown-item nav-item">
+                  <a class="nav-link" href="{{ url_for('logout') }}">Log Out</a>
+                </li>
+              </ul>
+            </li>
+          {% else %}
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                Account
+              </a>
+              <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdownMenuLink">
+                <li class="dropdown-item nav-item">
+                  <a class="nav-link {% if active=='login' %}active{% endif %}" href="{{ url_for('login') }}">Log In</a>
+                </li>
+                <li class="dropdown-item nav-item">
+                  <a class="nav-link {% if active=='signup' %}active{% endif %}" href="{{ url_for('signup') }}">Sign Up</a>
+                </li>
+              </ul>
+            </li>
+          {% endif %}
         </ul>
       </div> 
     </div>

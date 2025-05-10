@@ -1,10 +1,22 @@
-from app import db
-class User(db.Model):
+from flask_login import UserMixin
+from werkzeug.security import generate_password_hash, check_password_hash
+from config import db
+
+class User(UserMixin, db.Model):
     username = db.Column(db.String, primary_key=True)
     email = db.Column(db.String, nullable=False, unique=True)
     password = db.Column(db.String, nullable=False)
     matches = db.relationship("Match", backref="user", lazy=True)
     teams = db.relationship("Team", backref="user", lazy=True)
+
+    def set_password(self, password):
+        self.password = generate_password_hash(password, method='pbkdf2:sha256')
+
+    def check_password(self, password):
+        return check_password_hash(self.password, password)
+
+    def get_id(self):
+        return self.username  # Return username instead of id
 
 class Match(db.Model):
     id = db.Column(db.Integer, primary_key=True)

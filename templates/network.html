@@ -15,6 +15,7 @@
   {% endwith %}
 
   <form action="{{ url_for('network') }}" method="post" class="network-form">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
     <input
       type="text"
       name="search_user"

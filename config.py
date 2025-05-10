@@ -1,8 +1,13 @@
-import os 
+import os
+from flask_sqlalchemy import SQLAlchemy
+from flask_migrate import Migrate
+
+db = SQLAlchemy()
+migrate = Migrate()
 
 basedir = os.path.abspath(os.path.dirname(__file__))
-default_database_location = 'sqlite:///' + os.path.join(basedir, 'app.db')
+instance_db_path = os.path.join(basedir, "instance", "app.db")
 
 class Config:
-    SQLALCHEMY_DATABASE_URI = os.getenv('DATABASE_URL') or default_database_location
-    SECRET_KEY = "dev"
+    SQLALCHEMY_DATABASE_URI = os.getenv("DATABASE_URL") or f"sqlite:///{instance_db_path}"
+    SECRET_KEY = os.getenv('SECRET_KEY')

@@ -1,29 +1,40 @@
 from flask import Flask, render_template, request, redirect, url_for, flash, session
-from flask_sqlalchemy import SQLAlchemy
-from flask_migrate import Migrate
-from werkzeug.security import generate_password_hash, check_password_hash
+from config import Config, db, migrate
+from flask_login import LoginManager, login_user, logout_user, login_required, current_user
+from flask_wtf import CSRFProtect
 import random
 import requests
 from random import randint
-import requests
-from config import Config
+from models import User
 
 app = Flask(__name__)
-app.secret_key = "dev"  # Needed for flash messages
 app.config.from_object(Config)
+
 # --- Database setup ---
-db = SQLAlchemy(app)
-migrate = Migrate(app, db)
+db.init_app(app)
+migrate.init_app(app, db)
+
+# --- Flask login setup ---
+login_manager = LoginManager()
+login_manager.init_app(app)
+login_manager.login_view = "login"
+
+csrf = CSRFProtect(app)
 
 from models import User, Match, Team, Pokemon, Moves
 
 # Routes
+@login_manager.user_loader
+def load_user(user_id):
+    return User.query.get(user_id)
+    
 @app.route("/")
 def index():
     username = session.get('user')  # Get username from session
     return render_template("index.html", active="home", username=username)
 
 @app.route("/upload", methods=["GET", "POST"])
+@login_required
 def upload():
     if request.method == "POST":
         #TODO: change this into database later
@@ -44,6 +55,7 @@ def upload():
     return render_template("upload.html", active="upload")
 
 @app.route("/visualise", methods=["GET", "POST"])
+@login_required
 def visualise():
     username = session.get("username", "")
     pokepaste = session.get("pokepaste", "")
@@ -96,6 +108,7 @@ def visualise():
     )
 
 @app.route("/network", methods=["GET", "POST"])
+@login_required
 def network():
     users = [u.username for u in User.query.all()]
     if request.method == "POST":
@@ -110,8 +123,8 @@ def login():
         username = request.form["username"]
         password = request.form["password"]
         user = User.query.filter_by(username=username).first()
-        if user and check_password_hash(user.password, password):
-            session["user"] = user.username
+        if user and user.check_password(password):
+            login_user(user)  # Flask-Login handles the session
             flash("Logged in successfully!", "success")
             return redirect(url_for("index"))
         else:
@@ -125,11 +138,18 @@ def signup():
         username = request.form["username"]
         email = request.form["email"]
         password = request.form["password"]
+        confirm_password = request.form["confirm-password"]
         if User.query.filter_by(username=username).first():
             flash("Username already exists.", "danger")
             return redirect(url_for("signup"))
-        hashed_pw = generate_password_hash(password)
-        new_user = User(username=username, email=email, password=hashed_pw)
+        if User.query.filter_by(email=email).first():
+            flash("Email is already registered.", "danger")
+            return redirect(url_for("signup"))
+        if password != confirm_password:
+            flash("Passwords do not match.", "danger")
+            return redirect(url_for("signup"))
+        new_user = User(username=username, email=email)
+        new_user.set_password(password)
         db.session.add(new_user)
         db.session.commit()
         flash("Account created! You can now log in.", "success")
@@ -138,7 +158,7 @@ def signup():
 
 @app.route("/logout")
 def logout():
-    session.pop("user", None)
+    logout_user()
     flash("Logged out.", "info")
     return redirect(url_for("index"))
 
