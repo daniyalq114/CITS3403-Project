@@ -1,33 +1,47 @@
 from app import db
+
 class User(db.Model):
-    username = db.Column(db.String, primary_key=True)
+    username = db.Column(db.String, primary_key=True)  # Primary key
     email = db.Column(db.String, nullable=False, unique=True)
+    showdown_username = db.Column(db.String, unique=True,) 
     password = db.Column(db.String, nullable=False)
-    matches = db.relationship("Match", backref="user", lazy=True)
-    teams = db.relationship("Team", backref="user", lazy=True)
+    matches = db.relationship("Match", back_populates="user", cascade="all, delete-orphan")  # Cascade delete
+
 
 class Match(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String, db.ForeignKey("user.username"), nullable=False)
-    match_id = db.Column(db.String, nullable=False)
-    showdown_username = db.Column(db.String, nullable=False)
-    match_info = db.Column(db.Text)
+    # add a date field too, so we can sort later
+    id = db.Column(db.Integer, primary_key=True)  # Primary key
+    user_id = db.Column(db.Integer, db.ForeignKey("user.username"), nullable=False)  # Foreign key to User
+    user = db.relationship("User", back_populates="matches")  # Back reference to User
+    enemyname = db.Column(db.String)
+    teams = db.relationship("Team", back_populates="match", cascade="all, delete-orphan")  # Cascade delete
+    p1_initial_elo = db.Column(db.Integer)
+    p1_final_elo = db.Column(db.Integer)
+    p2_initial_elo = db.Column(db.Integer)
+    p2_final_elo = db.Column(db.Integer)
+
 
 class Team(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String, db.ForeignKey("user.username"), nullable=False)
-    team_data = db.Column(db.Text)
+    id = db.Column(db.Integer, primary_key=True)  # Primary key
+    match_id = db.Column(db.Integer, db.ForeignKey("match.id"), nullable=False)  # Foreign key to Match
+    is_user_team = db.Column(db.Boolean, nullable=False)  # True = user's team, False = enemy's team
+    match = db.relationship("Match", back_populates="teams")  # Back reference to Match
+    pokemons = db.relationship("TeamPokemon", back_populates="team", cascade="all, delete-orphan")  # Cascade delete
 
-# Association table for many-to-many relationship
-pokemon_moves = db.Table('pokemon_moves',
-    db.Column('pokemon_name', db.String, db.ForeignKey('pokemon.name'), primary_key=True),
-    db.Column('move_name', db.String, db.ForeignKey('moves.name'), primary_key=True)
-)
 
-class Pokemon(db.Model):
-    name = db.Column(db.String, primary_key=True)
-    moves = db.relationship('Moves', secondary=pokemon_moves, backref='pokemon', lazy=True)
+class TeamPokemon(db.Model):
+    id = db.Column(db.Integer, primary_key=True)  # Primary key
+    team_id = db.Column(db.Integer, db.ForeignKey("team.id"), nullable=False)  # Foreign key to Team
+    pokemon_name = db.Column(db.String, nullable=False)  # Pokémon name
+    # nickname = db.Column(db.String)  # Optional nickname
+    # position = db.Column(db.Integer)  # Optional position (e.g., 1-6)
+    team = db.relationship("Team", back_populates="pokemons")  # Back reference to Team
+    move_usages = db.relationship("MoveUsage", back_populates="team_pokemon", cascade="all, delete-orphan")  # Cascade delete
 
-class Moves(db.Model):
-    name = db.Column(db.String, primary_key=True)
-    count = db.Column(db.Integer, nullable=False)
+
+class MoveUsage(db.Model):
+    id = db.Column(db.Integer, primary_key=True)  # Primary key
+    team_pokemon_id = db.Column(db.Integer, db.ForeignKey("team_pokemon.id"), nullable=False)  # Foreign key to TeamPokemon
+    move_name = db.Column(db.String, nullable=False)  # Move name
+    times_used = db.Column(db.Integer, default=0)  # Number of times the move was used
+    team_pokemon = db.relationship("TeamPokemon", back_populates="move_usages")  # Back reference to TeamPokemon

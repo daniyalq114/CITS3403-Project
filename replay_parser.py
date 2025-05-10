@@ -48,7 +48,7 @@ class ReplayLogParser:
         self.players = {"p1": Player(), "p2": Player()}  
         self.winner = None # to be updated after win condition is satisfied
         # this stuff is handled once main loop terminates
-        self.elo_data = {'p1': [0, 0, 0], 'p2': [0, 0, 0]}
+        self.elo_data = {'p1': [0, 0], 'p2': [0, 0]}
         self.terastallize = {'p1': False, 'p2': False}
 
         #TODO
@@ -155,28 +155,28 @@ class ReplayLogParser:
                 new_elo = line[2][temp:new_elo_end_index]
                 self.players[f"p{i}"].elo = [cur_elo, new_elo]
                 i+=1
-    
-    def get_formatted_data(self, username):
-        """Return formatted game data for the given username"""
-        is_player1 = self.players['p1'].name.lower() == username.lower()
+
+    # def get_formatted_data(self, username):
+    #     """Return formatted game data for the given username"""
+    #     is_player1 = self.players['p1'].name.lower() == username.lower()
         
-        return {
-            "win": self.replay.winner.lower() == username.lower(),
-            "enemyusr": {
-                "name": self.replay.player2.name if is_player1 else self.replay.player1.name,
-                "search_request": ""  # Add actual search request if available
-            },
-            "replay": {
-                "name": self.replay.title,
-                "search_request": ""  # Add actual replay URL if available
-            },
-            "oppteam": self.team2 if is_player1 else self.team1,
-            "usrpicks": self.picked_pokemon['p1'] if is_player1 else self.picked_pokemon['p2'],
-            "opppicks": self.picked_pokemon['p2'] if is_player1 else self.picked_pokemon['p1'],
-            "Terastallize": [
-                self.terastallize['p1'] if is_player1 else self.terastallize['p2'],
-                self.terastallize['p2'] if is_player1 else self.terastallize['p1']
-            ],
-            "ELO": self.elo_data['p1'] if is_player1 else self.elo_data['p2'],
-            "OTS": True  # Add logic to determine OTS if available
-        }
+    #     return {
+    #         "win": self.replay.winner.lower() == username.lower(),
+    #         "enemyusr": {
+    #             "name": self.replay.player2.name if is_player1 else self.replay.player1.name,
+    #             "search_request": ""  # Add actual search request if available
+    #         },
+    #         "replay": {
+    #             "name": self.replay.title,
+    #             "search_request": ""  # Add actual replay URL if available
+    #         },
+    #         "oppteam": self.team2 if is_player1 else self.team1,
+    #         "usrpicks": self.picked_pokemon['p1'] if is_player1 else self.picked_pokemon['p2'],
+    #         "opppicks": self.picked_pokemon['p2'] if is_player1 else self.picked_pokemon['p1'],
+    #         "Terastallize": [
+    #             self.terastallize['p1'] if is_player1 else self.terastallize['p2'],
+    #             self.terastallize['p2'] if is_player1 else self.terastallize['p1']
+    #         ],
+    #         "ELO": self.elo_data['p1'] if is_player1 else self.elo_data['p2'],
+    #         "OTS": True  # Add logic to determine OTS if available
+    #     }
