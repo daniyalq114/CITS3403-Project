@@ -1,12 +1,10 @@
 from flask import Flask, render_template, request, redirect, url_for, flash, session
-from config import Config
+from config import Config, db, migrate
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
 from flask_wtf import CSRFProtect
 import random
 import requests
 from random import randint
-import requests
-from extensions import db, migrate
 from models import User
 
 app = Flask(__name__)

@@ -93,7 +93,7 @@ Version Control: Git and GitHub for collaborative development
 13. When you're done, exit the virtual environment with `deactivate`.
 
 
-### Add or change database models (DEV ONLY)
+### Add or change database models (DEV ONLY REMOVE BEFORE SUBMISSION)
 1. Activate the virtual environment
 `source lugi-venv/bin/activate`
 
@@ -105,7 +105,7 @@ Version Control: Git and GitHub for collaborative development
 
 
 
-### Reset migrations and database (DEV ONLY)
+### Reset migrations and database (DEV ONLY REMOVE BEFORE SUBMISSION)
 1. Activate the virtual environment
 `source lugi-venv/bin/activate`
 
