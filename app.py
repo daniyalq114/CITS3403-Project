@@ -137,11 +137,15 @@ def signup():
         username = request.form["username"]
         email = request.form["email"]
         password = request.form["password"]
+        confirm_password = request.form["confirm-password"]
         if User.query.filter_by(username=username).first():
             flash("Username already exists.", "danger")
             return redirect(url_for("signup"))
         if User.query.filter_by(email=email).first():
             flash("Email is already registered.", "danger")
+            return redirect(url_for("signup"))
+        if password != confirm_password:
+            flash("Passwords do not match.", "danger")
             return redirect(url_for("signup"))
         new_user = User(username=username, email=email)
         new_user.set_password(password)
