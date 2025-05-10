@@ -6,10 +6,8 @@ db = SQLAlchemy()
 migrate = Migrate()
 
 basedir = os.path.abspath(os.path.dirname(__file__))
-instance_dir = os.path.join(basedir, 'instance')
-default_database_location = 'sqlite:///' + os.path.join(basedir, 'instance', 'app.db')
+instance_db_path = os.path.join(basedir, "instance", "app.db")
 
 class Config:
-    SQLALCHEMY_DATABASE_URI = os.getenv("DATABASE_URL") or \
-        "sqlite:///" + os.path.join(basedir, "instance", "app.db")
+    SQLALCHEMY_DATABASE_URI = os.getenv("DATABASE_URL") or f"sqlite:///{instance_db_path}"
     SECRET_KEY = os.getenv('SECRET_KEY')
