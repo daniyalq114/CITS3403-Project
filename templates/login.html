@@ -9,16 +9,6 @@
     <h2>Welcome Back</h2>
     <p class="subtitle">Sign in to continue</p>
 
-    {% with messages = get_flashed_messages(with_categories=true) %}
-      {% if messages %}
-        <ul class="flashes">
-          {% for cat, msg in messages %}
-            <li class="flash {{ cat }}">{{ msg }}</li>
-          {% endfor %}
-        </ul>
-      {% endif %}
-    {% endwith %}
-
     <form action="{{ url_for('login') }}" method="post" class="auth-form">
       <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
       <div class="form-group">

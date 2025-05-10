@@ -4,16 +4,6 @@
   <h1>Expand your Network</h1>
   <p>Enter the username of someone you’d like to connect with:</p>
 
-  {% with messages = get_flashed_messages(with_categories=true) %}
-    {% if messages %}
-      <ul class="flashes">
-        {% for category, msg in messages %}
-          <li class="flash {{ category }}">{{ msg }}</li>
-        {% endfor %}
-      </ul>
-    {% endif %}
-  {% endwith %}
-
   <form action="{{ url_for('network') }}" method="post" class="network-form">
     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
     <input
