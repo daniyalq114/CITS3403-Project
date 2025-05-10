@@ -20,7 +20,8 @@ from models import User, Match, Team, Pokemon, Moves
 # Routes
 @app.route("/")
 def index():
-    return render_template("index.html", active="home")
+    username = session.get('user')  # Get username from session
+    return render_template("index.html", active="home", username=username)
 
 @app.route("/upload", methods=["GET", "POST"])
 def upload():

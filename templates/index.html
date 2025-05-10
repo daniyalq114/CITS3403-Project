@@ -1,5 +1,10 @@
 {% extends "base.html" %}
 {% block content %}
+{% if username %}
+<div class="welcome-message">
+    <h3>Hello, {{ username }}!</h3>
+</div>
+{% endif %}
 <div class="row d-flex align-items-center rounded" id="maintext">
   <!-- Image column - will be full width on mobile, half width on desktop -->
   <div class="col-12 col-md-4 d-flex flex-column justify-content-center align-items-center mt-2 mb-2 mx-auto">
