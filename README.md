@@ -68,16 +68,18 @@ Version Control: Git and GitHub for collaborative development
 `pip install -r requirements.txt`
 
 7. Set the Flask application environment variable:
-| Platform | Shell      | Command                     |
-| -------- | ---------- | --------------------------- |
-| POSIX    | bash/zsh   | `export FLASK_APP=app.py`   |
-| Windows  | Powershell | `$env:FLASK_APP = "app.py"` |
+
+    | Platform | Shell      | Command                     |
+    | -------- | ---------- | --------------------------- |
+    | POSIX    | bash/zsh   | `export FLASK_APP=app.py`   |
+    | Windows  | Powershell | `$env:FLASK_APP = "app.py"` |
 
 8. Set the Flask secret key (replace 'your-very-secret-key' with a real random string when deploying):
-| Platform | Shell      | Command                                    |
-| -------- | ---------- | ------------------------------------------ |
-| POSIX    | bash/zsh   | `export SECRET_KEY='your-very-secret-key'` |
-| Windows  | Powershell | `$env:SECRET_KEY = "your-very-secret-key"` |
+
+    | Platform | Shell      | Command                                    |
+    | -------- | ---------- | ------------------------------------------ |
+    | POSIX    | bash/zsh   | `export SECRET_KEY='your-very-secret-key'` |
+    | Windows  | Powershell | `$env:SECRET_KEY = "your-very-secret-key"` |
 
 9. Creates /instance/app.db and applies migrations:
 `flask db upgrade`

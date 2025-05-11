@@ -113,6 +113,12 @@ def network():
     users = [u.username for u in User.query.all()]
     if request.method == "POST":
         target = request.form.get("search_user", "")
+        if not target:
+            flash("Please enter a username to search.", "warning")
+            return redirect(url_for("network"))
+        if target not in users:
+            flash(f"User {target} not found.", "error")
+            return redirect(url_for("network"))
         flash(f"Friend request sent to {target}", "success")
         return redirect(url_for("network"))
     return render_template("network.html", active="network", users=users)

@@ -4,15 +4,6 @@
 <div class="auth-container">
   <div class="auth-card">
     <h2>Create Account</h2>
-    {% with messages = get_flashed_messages(with_categories=true) %}
-      {% if messages %}
-        <ul class="flashes">
-          {% for cat, msg in messages %}
-            <li class="flash {{ cat }}">{{ msg }}</li>
-          {% endfor %}
-        </ul>
-      {% endif %}
-    {% endwith %}
     <form action="{{ url_for('signup') }}" method="post" class="auth-form">
       <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
       <div class="form-group">
