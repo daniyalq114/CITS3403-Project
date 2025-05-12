@@ -1,55 +1,31 @@
-from flask import Flask, render_template, request, redirect, url_for, flash, session
-from config import Config, db, migrate
-from flask_login import LoginManager, login_user, logout_user, login_required, current_user
-from flask_wtf import CSRFProtect
-import random
+from flask import render_template, request, redirect, url_for, flash, session
+from flask_login import login_user, logout_user, login_required, current_user
+from app import app, login_manager
+from models import User, Match, Team, Pokemon, Moves, db
 import requests
-from random import randint
-from models import User
 
-app = Flask(__name__)
-app.config.from_object(Config)
-
-# --- Database setup ---
-db.init_app(app)
-migrate.init_app(app, db)
-
-# --- Flask login setup ---
-login_manager = LoginManager()
-login_manager.init_app(app)
-login_manager.login_view = "login"
-
-csrf = CSRFProtect(app)
-
-from models import User, Match, Team, Pokemon, Moves
-
-# Routes
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.get(user_id)
-    
+
 @app.route("/")
 def index():
-    username = session.get('user')  # Get username from session
+    username = session.get('user')
     return render_template("index.html", active="home", username=username)
 
 @app.route("/upload", methods=["GET", "POST"])
 @login_required
 def upload():
     if request.method == "POST":
-        #TODO: change this into database later
-        # Read input from the form
         username = request.form.get("username", "").strip()
         pokepaste = request.form.get("pokepaste", "").strip()
         replays = [request.form.get(f"replay_{i}", "").strip() for i in range(40)]
-        replays = [replay for replay in replays if replay]  # Filter out empty inputs
+        replays = [replay for replay in replays if replay]
 
-        # Store the data in the session
         session["username"] = username
         session["pokepaste"] = pokepaste
         session["replays"] = replays
 
-        # Redirect to the visualise page
         return redirect(url_for("visualise"))
 
     return render_template("upload.html", active="upload")
@@ -65,12 +41,10 @@ def visualise():
     move_data = {}
 
     if data_submitted:
-        # Parse PokéPaste data
         pokepaste_parser = PokePasteParser()
         pokemon_data = pokepaste_parser.parse_pokepaste(pokepaste)
         pokepaste_parser.populate_sprites()
 
-        # Parse replays
         for replay_url in replay_urls:
             try:
                 response = requests.get(replay_url)
@@ -78,12 +52,10 @@ def visualise():
                 parser = ReplayHTMLParser()
                 parser.feed(response.text)
 
-                # Get formatted game data
                 game_data = parser.get_formatted_data(username)
                 game_data["replay"]["search_request"] = replay_url
                 games.append(game_data)
 
-                # Update move data
                 for pokemon, moves in parser.move_usage.items():
                     if pokemon not in move_data:
                         move_data[pokemon] = {}
@@ -130,7 +102,7 @@ def login():
         password = request.form["password"]
         user = User.query.filter_by(username=username).first()
         if user and user.check_password(password):
-            login_user(user)  # Flask-Login handles the session
+            login_user(user)
             flash("Logged in successfully!", "success")
             return redirect(url_for("index"))
         else:
@@ -145,6 +117,7 @@ def signup():
         email = request.form["email"]
         password = request.form["password"]
         confirm_password = request.form["confirm-password"]
+        
         if User.query.filter_by(username=username).first():
             flash("Username already exists.", "danger")
             return redirect(url_for("signup"))
@@ -154,6 +127,7 @@ def signup():
         if password != confirm_password:
             flash("Passwords do not match.", "danger")
             return redirect(url_for("signup"))
+            
         new_user = User(username=username, email=email)
         new_user.set_password(password)
         db.session.add(new_user)
@@ -167,6 +141,3 @@ def logout():
     logout_user()
     flash("Logged out.", "info")
     return redirect(url_for("index"))
-
-if __name__ == "__main__":
-    app.run(debug=True)
