@@ -13,7 +13,7 @@ class Config:
     SECRET_KEY = os.getenv('SECRET_KEY')
 
 class DeploymentConfig(Config):
-    SQLALCHEMY_DATABASE_URI = "sqlite:///" + os.path.join(basedir, "instance", "app.db")
+    SQLALCHEMY_DATABASE_URI = "sqlite:///" + instance_db_path
 
 class TestConfig(Config):
     SQLALCHEMY_DATABASE_URI = "sqlite:///:memory:"

@@ -2,6 +2,8 @@ from flask import Flask
 from config import Config, db, migrate
 from flask_login import LoginManager
 from flask_wtf import CSRFProtect
+from flask_sqlalchemy import SQLAlchemy
+from flask_migrate import Migrate
 
 app = Flask(__name__)
 app.config.from_object(Config)
