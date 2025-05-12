@@ -1,19 +1,20 @@
 from flask import render_template, request, redirect, url_for, flash, session
 from flask_login import login_user, logout_user, login_required, current_user
-from app import app, login_manager
-from models import User, Match, Team, Pokemon, Moves, db
+from app import db, login_manager
+from app.models import User, Match, Team, Pokemon, Moves
+from app.blueprints import main
 import requests
 
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.get(user_id)
 
-@app.route("/")
+@main.route("/")
 def index():
     username = session.get('user')
     return render_template("index.html", active="home", username=username)
 
-@app.route("/upload", methods=["GET", "POST"])
+@main.route("/upload", methods=["GET", "POST"])
 @login_required
 def upload():
     if request.method == "POST":
@@ -26,11 +27,11 @@ def upload():
         session["pokepaste"] = pokepaste
         session["replays"] = replays
 
-        return redirect(url_for("visualise"))
+        return redirect(url_for("main.visualise"))
 
     return render_template("upload.html", active="upload")
 
-@app.route("/visualise", methods=["GET", "POST"])
+@main.route("/visualise", methods=["GET", "POST"])
 @login_required
 def visualise():
     username = session.get("username", "")
@@ -79,7 +80,7 @@ def visualise():
         pokemon_data=pokemon_data if data_submitted else []
     )
 
-@app.route("/network", methods=["GET", "POST"])
+@main.route("/network", methods=["GET", "POST"])
 @login_required
 def network():
     users = [u.username for u in User.query.all()]
@@ -87,15 +88,15 @@ def network():
         target = request.form.get("search_user", "")
         if not target:
             flash("Please enter a username to search.", "warning")
-            return redirect(url_for("network"))
+            return redirect(url_for("main.network"))
         if target not in users:
             flash(f"User {target} not found.", "error")
-            return redirect(url_for("network"))
+            return redirect(url_for("main.network"))
         flash(f"Friend request sent to {target}", "success")
-        return redirect(url_for("network"))
+        return redirect(url_for("main.network"))
     return render_template("network.html", active="network", users=users)
 
-@app.route("/login", methods=["GET", "POST"])
+@main.route("/login", methods=["GET", "POST"])
 def login():
     if request.method == "POST":
         username = request.form["username"]
@@ -104,13 +105,13 @@ def login():
         if user and user.check_password(password):
             login_user(user)
             flash("Logged in successfully!", "success")
-            return redirect(url_for("index"))
+            return redirect(url_for("main.index"))
         else:
             flash("Invalid username or password.", "danger")
-            return redirect(url_for("login"))
+            return redirect(url_for("main.login"))
     return render_template("login.html", active="login")
 
-@app.route("/signup", methods=["GET", "POST"])
+@main.route("/signup", methods=["GET", "POST"])
 def signup():
     if request.method == "POST":
         username = request.form["username"]
@@ -120,24 +121,24 @@ def signup():
         
         if User.query.filter_by(username=username).first():
             flash("Username already exists.", "danger")
-            return redirect(url_for("signup"))
+            return redirect(url_for("main.signup"))
         if User.query.filter_by(email=email).first():
             flash("Email is already registered.", "danger")
-            return redirect(url_for("signup"))
+            return redirect(url_for("main.signup"))
         if password != confirm_password:
             flash("Passwords do not match.", "danger")
-            return redirect(url_for("signup"))
+            return redirect(url_for("main.signup"))
             
         new_user = User(username=username, email=email)
         new_user.set_password(password)
         db.session.add(new_user)
         db.session.commit()
         flash("Account created! You can now log in.", "success")
-        return redirect(url_for("login"))
+        return redirect(url_for("main.login"))
     return render_template("signup.html", active="signup")
 
-@app.route("/logout")
+@main.route("/logout")
 def logout():
     logout_user()
     flash("Logged out.", "info")
-    return redirect(url_for("index"))
+    return redirect(url_for("main.index"))

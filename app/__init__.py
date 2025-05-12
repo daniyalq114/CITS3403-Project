@@ -7,6 +7,7 @@ from flask_migrate import Migrate
 
 db = SQLAlchemy()
 migrate = Migrate()
+login_manager = LoginManager()
 
 def create_app():
     """Create and configure the Flask application."""
@@ -15,14 +16,16 @@ def create_app():
     
     db.init_app(app)
     migrate.init_app(app, db)
-    login_manager = LoginManager()
     login_manager.init_app(app)
-    login_manager.login_view = "login"
+    login_manager.login_view = "main.login"
     csrf = CSRFProtect(app)
+
+    # Register blueprint
+    from app.blueprints import main
+    app.register_blueprint(main)
+
     return app
 
-# Import routes after app initialization to avoid circular imports
-from routes import *
-
 if __name__ == "__main__":
+    app = create_app()
     app.run(debug=True)
