@@ -87,10 +87,13 @@ def network():
     if request.method == "POST":
         target = request.form.get("search_user", "")
         if not target:
-            flash("Please enter a username to search.", "warning")
+            flash("Please enter a username to search.", "error")
             return redirect(url_for("main.network"))
         if target not in users:
             flash(f"User {target} not found.", "error")
+            return redirect(url_for("main.network"))
+        if target == current_user.username:
+            flash("You cannot send a friend request to yourself.", "error")
             return redirect(url_for("main.network"))
         flash(f"Friend request sent to {target}", "success")
         return redirect(url_for("main.network"))
