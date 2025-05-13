@@ -29,7 +29,6 @@ This assumes pokemon will not have empty names or names containing the char '|'.
 import requests
 # from app.models import *
 from dataclasses import dataclass, field
-
 @dataclass
 class Pokemon:
     name: str = ""
@@ -51,7 +50,6 @@ class ReplayLogParser:
         self.players = {"p1": Player(), "p2": Player()}  
         self.winner = None # to be updated after win condition is satisfied
         # this stuff is handled once main loop terminates
-        self.elo_data = {'p1': [0, 0], 'p2': [0, 0]}
         # stores the most recent attacker for each team
         # used to track which pokemon are responsible for fainting others
         self.last_attacker = ["", ""] 
@@ -87,6 +85,7 @@ class ReplayLogParser:
 
         for line in self.log:
             line = line.split('|')
+            if len(line) < 2: continue
             if line[1] == 'win': break
             match line[1]: 
                 case 'switch':
@@ -228,35 +227,31 @@ def save_parsed_log_to_db(parsed_log, db, s_username):
     # Update match winner and ELO data
     match.winner = parsed_log.winner
     for player_key, player in parsed_log.players.items():
-        if player_key == "p1":
-            match.p1_initial_elo = player.elo[0]
-            match.p1_final_elo = player.elo[1]
-        elif player_key == "p2":
-            match.p2_initial_elo = player.elo[0]
-            match.p2_final_elo = player.elo[1]
+        if len(player.elo) == 2: # don't add elo to db if game is not competitive
+            if player_key == "p1":
+                match.p1_initial_elo = player.elo[0]
+                match.p1_final_elo = player.elo[1]
+            elif player_key == "p2":
+                match.p2_initial_elo = player.elo[0]
+                match.p2_final_elo = player.elo[1]
     db.session.commit()
 
+def unpack_display_replay(replay):
+    print("Player 1:", replay.players['p1'].name)
+    print("ELO:", replay.players['p1'].elo)
+    # prints each pokemon for player1's team, including moves, and defeated pokemon
+    print("Player 1 picks:", replay.players['p1'].picks)
+    for pokemon in replay.players['p1'].team:
+        print(f"{pokemon}, {replay.players['p1'].team[pokemon]}")
+    print()
 
-# die 
-# log = "https://replay.pokemonshowdown.com/oumonotype-82345404"
-# temp = ReplayLogParser(log)
-replay = ReplayLogParser('https://replay.pokemonshowdown.com/gen9vgc2025regi-2359297693-to7lmydgf9xotduir2oo3fxsls88fn5pw')
+    # same for player 2, 3, {...} , n, etc
+    print("Player 2:", replay.players['p2'].name)
+    print("ELO:", replay.players['p2'].elo)
+    print("Player 2 picks:", replay.players['p2'].picks)
+    for pokemon in replay.players['p2'].team:
+        print(f"{pokemon}, {replay.players['p2'].team[pokemon]}")
+    print()
 
-print("Player 1:", replay.players['p1'].name)
-print("ELO:", replay.players['p1'].elo)
-# prints each pokemon for player1's team, including moves, and defeated pokemon
-print("Player 1 picks:", list(map(lambda x: (x, replay.players['p1'].team[x]), replay.players['p1'].picks)))
-for pokemon in replay.players['p1'].team:
-    print(f"{pokemon}, {replay.players['p1'].team[pokemon]}")
-print()
-
-# same for player 2, 3, {...} , n, etc
-print("Player 2:", replay.players['p2'].name)
-print("ELO:", replay.players['p2'].elo)
-print("Player 2 picks:", replay.players['p2'].picks)
-for pokemon in replay.players['p2'].team:
-    print(f"{pokemon}, {replay.players['p2'].team[pokemon]}")
-print()
-
-# return the winning team
-print("Winner:", replay.winner)
+    # return the winning team
+    print("Winner:", replay.winner)
