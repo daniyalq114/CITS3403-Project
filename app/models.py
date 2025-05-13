@@ -4,6 +4,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from app import db  # Changed from 'config import db'
 
 class User(UserMixin, db.Model):
+    __tablename__ = "user"
     username = db.Column(db.String, primary_key=True)
     email = db.Column(db.String, nullable=False, unique=True)
     showdown_username = db.Column(db.String, unique=True,) 
@@ -19,6 +20,7 @@ class User(UserMixin, db.Model):
         return self.username  # Return username instead of id
 
 class Match(db.Model):
+    __tablename__ = "match"
     # add a date field too, so we can sort later
     id = db.Column(db.Integer, primary_key=True)  # Primary key
     user_id = db.Column(db.Integer, db.ForeignKey("user.username"), nullable=False)  # Foreign key to User
@@ -32,6 +34,7 @@ class Match(db.Model):
 
 
 class Team(db.Model):
+    __tablename__ = "team"
     id = db.Column(db.Integer, primary_key=True)  # Primary key
     match_id = db.Column(db.Integer, db.ForeignKey("match.id"), nullable=False)  # Foreign key to Match
     is_user_team = db.Column(db.Boolean, nullable=False)  # True = user's team, False = enemy's team
@@ -40,6 +43,7 @@ class Team(db.Model):
 
 
 class TeamPokemon(db.Model):
+    __tablename__ = "team_pokemon"
     id = db.Column(db.Integer, primary_key=True)  # Primary key
     team_id = db.Column(db.Integer, db.ForeignKey("team.id"), nullable=False)  # Foreign key to Team
     pokemon_name = db.Column(db.String, nullable=False)  # Pokémon name
@@ -50,6 +54,7 @@ class TeamPokemon(db.Model):
 
 
 class MoveUsage(db.Model):
+    __tablename__ = "move_usage"
     id = db.Column(db.Integer, primary_key=True)  # Primary key
     team_pokemon_id = db.Column(db.Integer, db.ForeignKey("team_pokemon.id"), nullable=False)  # Foreign key to TeamPokemon
     move_name = db.Column(db.String, nullable=False)  # Move name

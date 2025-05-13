@@ -20,16 +20,8 @@ def upload():
     if request.method == "POST":
         # Read input from the form
         s_username = request.form.get("username", "").strip()
-        if "user" not in session:
-            flash("You must be logged in to upload data.", "danger")
-            return redirect(url_for("main.login"))
-
-        user = User.query.filter_by(username=session["user"]).first()
-        if not user:
-            flash("User not found.", "danger")
-            return redirect(url_for("main.login"))
-        # best practice would be to authenticate with pokemon showdown
-        if user.showdown_username:
+        user = User.query.filter_by(username=current_user.username).first()
+        if current_user.showdown_username:
             if user.showdown_username != s_username:
                 flash(
                     f"Showdown username mismatch! Your current showdown username is '{user.showdown_username}'.",
@@ -44,7 +36,7 @@ def upload():
         replays = [request.form.get(f"replay_{i}", "").strip() for i in range(40)]
         replays = [replay for replay in replays if replay]  # Filter out empty inputs
         session["replays"] = replays 
-
+        session["s_username"] = s_username
         # Redirect to the visualise page
         return redirect(url_for("main.visualise"))
 
@@ -73,7 +65,7 @@ def visualise():
             # try:
                 parsed_log = ReplayLogParser(replay_url)
                 # writes relevant information to database
-                save_parsed_log_to_db(parsed_log, db)
+                save_parsed_log_to_db(parsed_log, db, session["s_username"])
                 
             # except Exception as e:
             #     flash(f"Failed to process replay {replay_url}: {str(e)}", "error")

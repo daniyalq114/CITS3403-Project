@@ -32,13 +32,15 @@ from dataclasses import dataclass, field
 
 @dataclass
 class Pokemon:
+    name: str = ""
     moves: dict = field(default_factory=dict)
     wins: int = 0
 
 @dataclass
 class Player:
     name: str = ""
-    # associates moves with the pokemon that performed the move
+    # stores a dictionary containing a player's pokemon
+    # We use the pokemon's nicknames (if they have them) as keys
     team: dict = field(default_factory=dict)
     # stores a list of pokemon names that are actually used
     picks: set = field(default_factory=set) 
@@ -50,15 +52,18 @@ class ReplayLogParser:
         self.winner = None # to be updated after win condition is satisfied
         # this stuff is handled once main loop terminates
         self.elo_data = {'p1': [0, 0], 'p2': [0, 0]}
-        self.terastallize = {'p1': False, 'p2': False}
-
+        # stores the most recent attacker for each team
+        # used to track which pokemon are responsible for fainting others
+        self.last_attacker = ["", ""] 
         #TODO
+        # handle terastallize
+        self.terastallize = {'p1': False, 'p2': False}
         # mostly to be returned to intermediary database-communicating class
         self.replay_url = URL
 
         response = requests.get(f"{URL}.log")
         response.raise_for_status()
-        
+
         # constructs an iterator, so we can divide the loop into several 
         # functions that operate over specific areas, without having to keep track
         # of where we're up 
@@ -75,10 +80,7 @@ class ReplayLogParser:
         and stores this data in relevant fields such as `self.players`, 
         `self.winner` etc. 
         """
-        # stores active pokemon for each player
-        # active_pokemon[0] is player 1's active pokemon
-        # updated every time "switch" is encountered
-        active_pokemon = [None, None]  
+        # stores active pokemon for each player, using their nicknames as keys
 
         # Initialize players before the game starts
         self.getPlayerData() # we are now at "|start|..."
@@ -86,36 +88,55 @@ class ReplayLogParser:
         for line in self.log:
             line = line.split('|')
             if line[1] == 'win': break
-            # I think the reason it has "p1a", "p2a" is to differentiate between members of a team?
-            # need to double check, but i think p1a p1b are two players in the same team
             match line[1]: 
                 case 'switch':
-                    # this has to be done within each switch statement, as other lines that don't start
-                    # with these specific fields do not follow the same format
-                    p_num = line[2][1] 
-                    pokemon_name = line[3].split(',')[0].strip()  # Extract and clean Pokémon name
-                    self.players[f'p{p_num}'].picks.add(pokemon_name)
-                    self.players[f'p{p_num}'].team.setdefault(pokemon_name, Pokemon()).active = True
-                    active_pokemon[int(p_num) - 1] = pokemon_name  # Update active Pokémon
+                    # For some god forsaken reason, the log refers to the pokemon 
+                    # almost exclusively by their nickname. Despite this, the initial list
+                    # of pokemon fails to include their nicknames. Terrific. 
+                    # If you're curious, just add ".log" to the end of a replay, and look at all 
+                    # the "poke" fields
+
+                    # Converts "|switch|p1b: Calyrex|..." into [p1b, Calyrex]
+                    active_p_num, nickname = line[2].split(": ")
+                    pokemon_name = line[3].split(',')[0]
+                    t = self.players[active_p_num[:2]].team # e.g. players["p1"].team
+                    if nickname not in t and nickname != pokemon_name:
+                        # Replace the key with the nickname instead
+                        # The pokemon is already added to team in `getPlayerData`, so never fails
+                        temp = Pokemon()
+                        temp.name = pokemon_name
+                        temp.moves = t[pokemon_name].moves.copy()
+                        temp.wins = t[pokemon_name].wins
+                        t.pop(pokemon_name)
+                        t[nickname] = temp
+                        if nickname == "May Day Parade":
+                            print()
+                    # adds the pokemon to the 'picks' set of e.g. players['p1']
+                    self.players[active_p_num[:2]].picks.add(nickname)
 
                 case 'move':
-                    p_num = line[2][1]
-                    pokemon_name = active_pokemon[int(p_num) - 1]
+                    active_p_num, nickname = line[2].split(": ")
+                    # active_p_num looks like `p1a`, p_num looks like "1"
+                    p_num = int(active_p_num[1])
+                    # updates the most recent attacking pokemon for the team
+                    self.last_attacker[p_num - 1] = nickname # index starts at 0
                     move_name = line[3]
-                    pokemon = self.players[f'p{p_num}'].team.setdefault(pokemon_name, Pokemon())
+                    pokemon = self.players[f"p{p_num}"].team[nickname]
                     pokemon.moves[move_name] = pokemon.moves.get(move_name, 0) + 1
 
                 case 'faint':
-                    p_num = line[2][1]
-                    attacker_player = 1 if p_num == '2' else 2
-                    attacker_pokemon = active_pokemon[attacker_player - 1]
-                    self.players[f'p{attacker_player}'].team[attacker_pokemon].wins += 1
+                    active_p_num, nickname = line[2].split(": ")
+                    enemy_index = int(active_p_num[1]) % 2 # p1a -> 1, p2a -> 0
+                    attacker_pokemon = self.last_attacker[enemy_index] 
+                    self.players[f"p{enemy_index + 1}"].team[attacker_pokemon].wins += 1
                     
-        if next(self.log).split('|')[1] != 'raw': 
-            # we've run out of lines early - no winner...
+
+        if line[1] != "win":
+            # We've run out of lines early. Dodgy log
             raise Exception("Replay terminates before win state is met. Please supply a valid replay.")
-        self.winner = line[2]
-        self.handleGameEnd()
+        else:
+            self.winner = line[2]
+            self.handleGameEnd()
     
     def getPlayerData(self):
         """Retrieves initial pokemon data from `log`.
@@ -134,7 +155,7 @@ class ReplayLogParser:
                     # ignores irrelevant details about pokemon's name
                     # e.g. "Pikachu, F, shiny" - we only want "Pikachu"
                     pokemon_name = line[3].split(',')[0].strip()  
-                    if pokemon_name:  # Ensure the name is not empty or None
+                    if pokemon_name:  # Ensure the name is not empty or None - no funny business
                         self.players[line[2]].team.setdefault(pokemon_name, Pokemon())
 
     def handleGameEnd(self):
@@ -144,28 +165,28 @@ class ReplayLogParser:
         """
         i = 1
         for line in self.log:
-            line = line.split('|')
-            if line[1] == 'raw': # '|raw| Ladder updating...' is handled by parse loop
-                # finding and setting the current elo
-                temp = line[2].find(" rating: ") + 9 # index of the current elo
-                cur_elo_end_index = line[2].find(" ", temp)
-                cur_elo = line[2][temp:cur_elo_end_index]
+            if line.startswith("|raw"): # so we don't look for " rating " a million times
+                if " rating: " in line: # we have an elo updating line
+                    line = line.split('|')
+                    # finding and setting the current elo
+                    temp = line[2].find(" rating: ") + 9 # index of the current elo
+                    cur_elo_end_index = line[2].find(" ", temp)
+                    cur_elo = line[2][temp:cur_elo_end_index]
 
-                temp = line[2].find("<strong>") + 8
-                new_elo_end_index = line[2].find("</strong>", temp)
-                new_elo = line[2][temp:new_elo_end_index]
-                self.players[f"p{i}"].elo = [cur_elo, new_elo]
-                i+=1
+                    temp = line[2].find("<strong>") + 8
+                    new_elo_end_index = line[2].find("</strong>", temp)
+                    new_elo = line[2][temp:new_elo_end_index]
+                    self.players[f"p{i}"].elo = [cur_elo, new_elo]
+                    i+=1
 
-def save_parsed_log_to_db(parsed_log, db):
+def save_parsed_log_to_db(parsed_log, db, s_username):
     players = parsed_log.players
     match = Match(
-        user_id=session["user"], # showdown name FK - links match to user
+        user_id=s_username, # showdown name FK - links match to user
         # to store half as much data (when the opposing player submits their matches), have enemyname be another FK
         enemyname=players['p2'].name,
         teams=[]  # Teams will be added later
     )
-    print("we get here")
     db.session.add(match)
     db.session.commit()
 
