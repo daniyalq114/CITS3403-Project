@@ -27,7 +27,7 @@ Usage Example:
 This assumes pokemon will not have empty names or names containing the char '|'.
 """
 import requests
-from app.models import *
+# from app.models import *
 from dataclasses import dataclass, field
 
 @dataclass
@@ -103,14 +103,20 @@ class ReplayLogParser:
                     if nickname not in t and nickname != pokemon_name:
                         # Replace the key with the nickname instead
                         # The pokemon is already added to team in `getPlayerData`, so never fails
+                        if pokemon_name not in t:
+                            # we have an interesting case like Urshifu-Single-Strike vs Urshifu-Rapid-Strike
+                            # or like deoxys
+                            for p in t.keys():
+                                if p.endswith("-*") and pokemon_name.startswith(p[:-2]): 
+                                    pokemon_name = p
+                                    break
+                                    
                         temp = Pokemon()
                         temp.name = pokemon_name
                         temp.moves = t[pokemon_name].moves.copy()
                         temp.wins = t[pokemon_name].wins
                         t.pop(pokemon_name)
                         t[nickname] = temp
-                        if nickname == "May Day Parade":
-                            print()
                     # adds the pokemon to the 'picks' set of e.g. players['p1']
                     self.players[active_p_num[:2]].picks.add(nickname)
 
@@ -229,3 +235,28 @@ def save_parsed_log_to_db(parsed_log, db, s_username):
             match.p2_initial_elo = player.elo[0]
             match.p2_final_elo = player.elo[1]
     db.session.commit()
+
+
+# die 
+# log = "https://replay.pokemonshowdown.com/oumonotype-82345404"
+# temp = ReplayLogParser(log)
+replay = ReplayLogParser('https://replay.pokemonshowdown.com/gen9vgc2025regi-2359297693-to7lmydgf9xotduir2oo3fxsls88fn5pw')
+
+print("Player 1:", replay.players['p1'].name)
+print("ELO:", replay.players['p1'].elo)
+# prints each pokemon for player1's team, including moves, and defeated pokemon
+print("Player 1 picks:", list(map(lambda x: (x, replay.players['p1'].team[x]), replay.players['p1'].picks)))
+for pokemon in replay.players['p1'].team:
+    print(f"{pokemon}, {replay.players['p1'].team[pokemon]}")
+print()
+
+# same for player 2, 3, {...} , n, etc
+print("Player 2:", replay.players['p2'].name)
+print("ELO:", replay.players['p2'].elo)
+print("Player 2 picks:", replay.players['p2'].picks)
+for pokemon in replay.players['p2'].team:
+    print(f"{pokemon}, {replay.players['p2'].team[pokemon]}")
+print()
+
+# return the winning team
+print("Winner:", replay.winner)
