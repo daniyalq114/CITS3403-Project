@@ -4,7 +4,7 @@
   <div class="content">
     <h1>Visualise your Replays</h1>
 
-    <form action="{{ url_for('visualise') }}" method="post" class="visualise-form">
+    <form action="{{ url_for('main.visualise') }}" method="post" class="visualise-form">
       <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
       <label for="username">
         Enter the Pokémon Showdown username whose report you want to view

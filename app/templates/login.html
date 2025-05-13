@@ -9,7 +9,7 @@
     <h2>Welcome Back</h2>
     <p class="subtitle">Sign in to continue</p>
 
-    <form action="{{ url_for('login') }}" method="post" class="auth-form">
+    <form action="{{ url_for('main.login') }}" method="post" class="auth-form">
       <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
       <div class="form-group">
         <label for="username">Username</label>
@@ -24,7 +24,7 @@
 
     <p class="switch-text">
       Don’t have an account?
-      <a href="{{ url_for('signup') }}">Sign Up</a>
+      <a href="{{ url_for('main.signup') }}">Sign Up</a>
     </p>
   </div>
 </div>

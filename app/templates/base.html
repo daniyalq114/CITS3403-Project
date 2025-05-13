@@ -24,7 +24,7 @@
 <body>
   <nav class="navbar navbar-expand-md">
     <div class="container-fluid d-flex justify-content-between align-items-center">
-      <a href="{{ url_for('index') }}" class="logo">
+      <a href="{{ url_for('main.index') }}" class="logo">
         <img
           src="{{ url_for('static', filename='images/logo.png') }}"
           alt="LugiAnalytics logo"
@@ -39,17 +39,17 @@
       <div class="collapse navbar-collapse justify-content-end" id="navbarContent">
         <ul class="navbar-nav ms-auto">
           <li class="nav-item">
-            <a class="nav-link {% if active=='home' %}active{% endif %}" href="{{ url_for('index') }}">Home</a>
+            <a class="nav-link {% if active=='home' %}active{% endif %}" href="{{ url_for('main.index') }}">Home</a>
           </li>
           {% if current_user.is_authenticated %}
             <li class="nav-item">
-              <a class="nav-link {% if active=='upload' %}active{% endif %}" href="{{ url_for('upload') }}">Upload</a>
+              <a class="nav-link {% if active=='upload' %}active{% endif %}" href="{{ url_for('main.upload') }}">Upload</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link {% if active=='visualise' %}active{% endif %}" href="{{ url_for('visualise') }}">Visualise</a>
+              <a class="nav-link {% if active=='visualise' %}active{% endif %}" href="{{ url_for('main.visualise') }}">Visualise</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link {% if active=='network' %}active{% endif %}" href="{{ url_for('network') }}">Network</a>
+              <a class="nav-link {% if active=='network' %}active{% endif %}" href="{{ url_for('main.network') }}">Network</a>
             </li>
           {% endif %}
           {% if current_user.is_authenticated %}
@@ -59,7 +59,7 @@
               </a>
               <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdownMenuLink">
                 <li class="dropdown-item nav-item">
-                  <a class="nav-link" href="{{ url_for('logout') }}">Log Out</a>
+                  <a class="nav-link" href="{{ url_for('main.logout') }}">Log Out</a>
                 </li>
               </ul>
             </li>
@@ -70,10 +70,10 @@
               </a>
               <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdownMenuLink">
                 <li class="dropdown-item nav-item">
-                  <a class="nav-link {% if active=='login' %}active{% endif %}" href="{{ url_for('login') }}">Log In</a>
+                  <a class="nav-link {% if active=='login' %}active{% endif %}" href="{{ url_for('main.login') }}">Log In</a>
                 </li>
                 <li class="dropdown-item nav-item">
-                  <a class="nav-link {% if active=='signup' %}active{% endif %}" href="{{ url_for('signup') }}">Sign Up</a>
+                  <a class="nav-link {% if active=='signup' %}active{% endif %}" href="{{ url_for('main.signup') }}">Sign Up</a>
                 </li>
               </ul>
             </li>

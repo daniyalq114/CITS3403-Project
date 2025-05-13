@@ -4,7 +4,7 @@
 <div class="auth-container">
   <div class="auth-card">
     <h2>Create Account</h2>
-    <form action="{{ url_for('signup') }}" method="post" class="auth-form">
+    <form action="{{ url_for('main.signup') }}" method="post" class="auth-form">
       <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
       <div class="form-group">
         <label for="new-username">Username</label>
@@ -26,7 +26,7 @@
     </form>
     <p class="switch-text">
       Already have an account?
-      <a href="{{ url_for('login') }}">Log In</a>
+      <a href="{{ url_for('main.login') }}">Log In</a>
     </p>
   </div>
 </div>

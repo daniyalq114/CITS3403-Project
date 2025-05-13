@@ -6,7 +6,7 @@
       <div class="col-10 col-sm-12">
         <h1>Upload your Data</h1>
 
-        <form action="{{ url_for('upload') }}" method="post" class="upload-form">
+        <form action="{{ url_for('main.upload') }}" method="post" class="upload-form">
           <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
           <div class="step">
             <p>Step 1: Enter your Pokémon Showdown username</p>

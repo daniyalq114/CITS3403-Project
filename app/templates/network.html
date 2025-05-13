@@ -4,7 +4,7 @@
   <h1>Expand your Network</h1>
   <p>Enter the username of someone you’d like to connect with:</p>
 
-  <form action="{{ url_for('network') }}" method="post" class="network-form">
+  <form action="{{ url_for('main.network') }}" method="post" class="network-form">
     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
     <input
       type="text"
