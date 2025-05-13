@@ -43,17 +43,21 @@ Version Control: Git and GitHub for collaborative development
 
 ### Running the test site
 1. Navigate to the directory you'd like to store LugiAnalytics, for instance:
-`cd Desktop/dev/`
-
+```shell
+cd Desktop/dev/
+```
 2. Clone the repository:
-`git clone https://github.com/daniyalq114/CITS3403-Project.git`
-
+```shell
+git clone https://github.com/daniyalq114/CITS3403-Project.git
+```
 3. Navigate to the project directory:
-`cd CITS3403-Project/`
-
+```shell
+cd CITS3403-Project/
+```
 4. Construct a virtual environment:
-`python3 -m venv lugi-venv`
-
+```shell
+python3 -m venv lugi-venv
+```
 5. Activate the environment: 
     | Platform | Shell      | Command                                 |
     |----------|------------|-----------------------------------------|
@@ -65,6 +69,16 @@ Version Control: Git and GitHub for collaborative development
     |          | Powershell | `source lugi-venv\Scripts\Activate.ps1` |
 
 6. Install dependencies
+```shell
+pip install -r requirements.txt
+```
+7. Set up the database
+```shell
+flask db init # initialise database
+flask db migrate # set up the database to follow schema in models.py
+flask db upgrade # apply the migration to the database
+```
+8. Run LugiAnalytics
 `pip install -r requirements.txt`
 
 7. Set the Flask application environment variable:
@@ -92,34 +106,4 @@ Version Control: Git and GitHub for collaborative development
 
 12. Open the returned url, e.g. for `* Running on http://127.0.0.1:5000` open `http://127.0.0.1:5000` in your browser. 
 
-13. When you're done, exit the virtual environment with `deactivate`.
-
-
-### Add or change database models (DEV ONLY REMOVE BEFORE SUBMISSION)
-1. Activate the virtual environment
-`source lugi-venv/bin/activate`
-
-2. Generate a new migration based on model changes
-`flask db migrate -m "Describe what changed here"`
-
-3. Apply the migration
-`flask db upgrade`
-
-
-
-### Reset migrations and database (DEV ONLY REMOVE BEFORE SUBMISSION)
-1. Activate the virtual environment
-`source lugi-venv/bin/activate`
-
-2. Delete the existing database and migrations
-`rm -r migrations/`
-`rm instance/app.db`
-
-3. Re-initialize the migrations folder
-`flask db init`
-
-4. Create a new initial migration (detects models)
-`flask db migrate -m "Initial migration - create tables"`
-
-5. Apply the migration to create the new database
-`flask db upgrade`
+When you're done, exit the virtual environment with `deactivate`

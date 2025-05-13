@@ -1,10 +1,10 @@
 from flask import render_template, request, redirect, url_for, flash, session
 from flask_login import login_user, logout_user, login_required, current_user
 from app import db, login_manager
-from app.models import User, Match, Team, Pokemon, Moves
+from app.models import User, Match, Team, TeamPokemon, MoveUsage
 from app.blueprints import main
 import requests
-
+from app.replay_parser import *
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.get(user_id)
@@ -18,67 +18,72 @@ def index():
 @login_required
 def upload():
     if request.method == "POST":
-        username = request.form.get("username", "").strip()
-        pokepaste = request.form.get("pokepaste", "").strip()
+        # Read input from the form
+        s_username = request.form.get("username", "").strip()
+        if "user" not in session:
+            flash("You must be logged in to upload data.", "danger")
+            return redirect(url_for("main.login"))
+
+        user = User.query.filter_by(username=session["user"]).first()
+        if not user:
+            flash("User not found.", "danger")
+            return redirect(url_for("main.login"))
+        # best practice would be to authenticate with pokemon showdown
+        if user.showdown_username:
+            if user.showdown_username != s_username:
+                flash(
+                    f"Showdown username mismatch! Your current showdown username is '{user.showdown_username}'.",
+                    "danger",
+                )
+                return redirect(url_for("main.upload"))
+        else:
+            user.showdown_username = s_username
+            db.session.commit()
+            flash("Showdown username updated successfully!", "success")
+        # add a `replays` field to the session containing all of the replay links
         replays = [request.form.get(f"replay_{i}", "").strip() for i in range(40)]
-        replays = [replay for replay in replays if replay]
+        replays = [replay for replay in replays if replay]  # Filter out empty inputs
+        session["replays"] = replays 
 
-        session["username"] = username
-        session["pokepaste"] = pokepaste
-        session["replays"] = replays
-
+        # Redirect to the visualise page
         return redirect(url_for("main.visualise"))
 
     return render_template("upload.html", active="upload")
 
+
 @main.route("/visualise", methods=["GET", "POST"])
 @login_required
 def visualise():
-    username = session.get("username", "")
-    pokepaste = session.get("pokepaste", "")
+    # username = session.get("username", "")
+    # pokepaste = session.get("pokepaste", "")
     replay_urls = session.get("replays", [])
-    data_submitted = bool(replay_urls)
+    # data_submitted = bool(replay_urls)
+    data_submitted = True
     games = []
     move_data = {}
 
     if data_submitted:
-        pokepaste_parser = PokePasteParser()
-        pokemon_data = pokepaste_parser.parse_pokepaste(pokepaste)
-        pokepaste_parser.populate_sprites()
-
+        # # Parse PokéPaste data
+        # pokepaste_parser = PokePasteParser()
+        # pokemon_data = pokepaste_parser.parse_pokepaste(pokepaste)
+        # pokepaste_parser.populate_sprites()
+        # Parse replays
+        # TODO prefil with None depending on the number of forms submitted
         for replay_url in replay_urls:
-            try:
-                response = requests.get(replay_url)
-                response.raise_for_status()
-                parser = ReplayHTMLParser()
-                parser.feed(response.text)
-
-                game_data = parser.get_formatted_data(username)
-                game_data["replay"]["search_request"] = replay_url
-                games.append(game_data)
-
-                for pokemon, moves in parser.move_usage.items():
-                    if pokemon not in move_data:
-                        move_data[pokemon] = {}
-                    for move, count in moves.items():
-                        if move not in move_data[pokemon]:
-                            move_data[pokemon][move] = 0
-                        move_data[pokemon][move] += count
-
-            except Exception as e:
-                flash(f"Failed to process replay {replay_url}: {str(e)}", "error")
-                continue
-
-    return render_template(
-        "visualise.html",
-        active="visualise",
-        data_submitted=data_submitted,
-        username=username,
-        pokepaste=pokepaste,
-        games=games,
-        move_data=move_data,
-        pokemon_data=pokemon_data if data_submitted else []
-    )
+            # try:
+                parsed_log = ReplayLogParser(replay_url)
+                # writes relevant information to database
+                save_parsed_log_to_db(parsed_log, db)
+                
+            # except Exception as e:
+            #     flash(f"Failed to process replay {replay_url}: {str(e)}", "error")
+            #     continue
+        # games = [] 
+        # fetch all matches associated with showdown user, and construct 'game' dicts to display
+        # on Jinja
+        # user = User.query.filter_by(username=session["user"]).first()
+        # print(user.matches)
+        return render_template("visualise.html")
 
 @main.route("/network", methods=["GET", "POST"])
 @login_required
