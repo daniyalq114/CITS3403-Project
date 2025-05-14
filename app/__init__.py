@@ -9,10 +9,14 @@ db = SQLAlchemy()
 migrate = Migrate()
 login_manager = LoginManager()
 
-def create_app():
+def create_app(config_class=Config):
     """Create and configure the Flask application."""
     app = Flask(__name__)
     app.config.from_object(Config)
+
+    # Register blueprint
+    from app.blueprints import main
+    app.register_blueprint(main)
     
     db.init_app(app)
     migrate.init_app(app, db)
@@ -20,12 +24,8 @@ def create_app():
     login_manager.login_view = "main.login"
     csrf = CSRFProtect(app)
 
-    # Register blueprint
-    from app.blueprints import main
-    app.register_blueprint(main)
-
     return app
 
 if __name__ == "__main__":
-    app = create_app()
+    app = ()
     app.run(debug=True)
