@@ -1,4 +1,4 @@
-from flask import render_template, request, redirect, url_for, flash, session
+from flask import render_template, request, redirect, url_for, flash, session, jsonify
 from flask_login import login_user, logout_user, login_required, current_user
 from app import db, login_manager
 from app.models import User, Match, Team, TeamPokemon, MoveUsage
@@ -88,21 +88,39 @@ def visualise():
 @main.route("/network", methods=["GET", "POST"])
 @login_required
 def network():
-    users = [u.username for u in User.query.all()]
-    if request.method == "POST":
-        target = request.form.get("search_user", "")
-        if not target:
-            flash("Please enter a username to search.", "error")
-            return redirect(url_for("main.network"))
-        if target not in users:
-            flash(f"User {target} not found.", "error")
-            return redirect(url_for("main.network"))
-        if target == current_user.username:
-            flash("You cannot send a friend request to yourself.", "error")
-            return redirect(url_for("main.network"))
-        flash(f"Friend request sent to {target}", "success")
-        return redirect(url_for("main.network"))
-    return render_template("network.html", active="network", users=users)
+    if request.method == "POST" and request.is_json:
+        target_username = request.json.get("username")
+
+        if not target_username or target_username == current_user.username:
+            return jsonify({'success': False, 'message': 'Invalid username'})
+
+        user = User.query.filter_by(username=target_username).first()
+        if not user:
+            return jsonify({'success': False, 'message': 'User not found'})
+
+        existing = SharedAccess.query.filter_by(
+            owner_username=current_user.username,
+            shared_with_username=target_username
+        ).first()
+
+        if existing:
+            return jsonify({'success': False, 'message': 'Already shared with this user'})
+
+        new_share = SharedAccess(
+            owner_username=current_user.username,
+            shared_with_username=target_username
+        )
+        db.session.add(new_share)
+        db.session.commit()
+
+        return jsonify({'success': True, 'message': f'Shared with {target_username}'})
+
+    # GET request: render network.html with users and shared list
+    all_users = [u.username for u in User.query.all() if u.username != current_user.username]
+    already_shared = [s.shared_with_username for s in SharedAccess.query.filter_by(owner_username=current_user.username).all()]
+    return render_template("network.html", users=all_users, shared_with=already_shared, active="network")
+
+
 
 @main.route("/login", methods=["GET", "POST"])
 def login():
@@ -150,3 +168,4 @@ def logout():
     logout_user()
     flash("Logged out.", "info")
     return redirect(url_for("main.index"))
+
