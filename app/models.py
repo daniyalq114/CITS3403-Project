@@ -18,12 +18,15 @@ class User(UserMixin, db.Model):
 
     def get_id(self):
         return self.username  # Return username instead of id
+    
 
 class Match(db.Model):
     __tablename__ = "match"
     # add a date field too, so we can sort later
     id = db.Column(db.Integer, primary_key=True)  # Primary key
-    user_id = db.Column(db.Integer, db.ForeignKey("user.username"), nullable=False)  # Foreign key to User
+    winner = db.Column(db.String)
+    replay_url = db.Column(db.String)
+    user_id = db.Column(db.Integer, db.ForeignKey("user.showdown_username"), nullable=False)  # Foreign key to User
     user = db.relationship("User", back_populates="matches")  # Back reference to User
     enemyname = db.Column(db.String)
     teams = db.relationship("Team", back_populates="match", cascade="all, delete-orphan")  # Cascade delete
@@ -47,6 +50,7 @@ class TeamPokemon(db.Model):
     id = db.Column(db.Integer, primary_key=True)  # Primary key
     team_id = db.Column(db.Integer, db.ForeignKey("team.id"), nullable=False)  # Foreign key to Team
     pokemon_name = db.Column(db.String, nullable=False)  # Pokémon name
+    ispick = db.Column(db.Boolean)
     # nickname = db.Column(db.String)  # Optional nickname
     # position = db.Column(db.Integer)  # Optional position (e.g., 1-6)
     team = db.relationship("Team", back_populates="pokemons")  # Back reference to Team

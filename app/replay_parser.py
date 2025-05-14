@@ -27,7 +27,7 @@ Usage Example:
 This assumes pokemon will not have empty names or names containing the char '|'.
 """
 import requests
-# from app.models import *
+from app.models import *
 from dataclasses import dataclass, field
 @dataclass
 class Pokemon:
@@ -81,7 +81,7 @@ class ReplayLogParser:
         # stores active pokemon for each player, using their nicknames as keys
 
         # Initialize players before the game starts
-        self.getPlayerData() # we are now at "|start|..."
+        self.parsePlayerData() # we are now at "|start|..."
 
         for line in self.log:
             line = line.split('|')
@@ -143,7 +143,7 @@ class ReplayLogParser:
             self.winner = line[2]
             self.handleGameEnd()
     
-    def getPlayerData(self):
+    def parsePlayerData(self):
         """Retrieves initial pokemon data from `log`.
         Fetches the username of the players and the team of each player, 
         and initialises `self.players['pn'].name` and `self.players['pn'].team`
@@ -190,7 +190,9 @@ def save_parsed_log_to_db(parsed_log, db, s_username):
         user_id=s_username, # showdown name FK - links match to user
         # to store half as much data (when the opposing player submits their matches), have enemyname be another FK
         enemyname=players['p2'].name,
-        teams=[]  # Teams will be added later
+        teams=[],  # Teams will be added later
+        winner=parsed_log.winner, 
+        replay_url=parsed_log.replay_url
     )
     db.session.add(match)
     db.session.commit()
@@ -208,7 +210,8 @@ def save_parsed_log_to_db(parsed_log, db, s_username):
         for pokemon_name, pokemon_data in players[team_key].team.items():
             team_pokemon = TeamPokemon(
                 team_id=team.id,
-                pokemon_name=pokemon_name
+                pokemon_name=pokemon_name, # I hope this works for weirdly nicknamed things
+                ispick=True if pokemon_name in players[team_key].picks else False
             )
             db.session.add(team_pokemon)
             db.session.commit()
@@ -236,7 +239,52 @@ def save_parsed_log_to_db(parsed_log, db, s_username):
                 match.p2_final_elo = player.elo[1]
     db.session.commit()
 
+def fetch_usr_matches_from_db(showdown_username):
+    """Returns a list of dictionaries representing matches for a given user."""
+    user = User.query.filter_by(showdown_username=showdown_username).first()
+    if not user: 
+        raise Exception("User doesn't exist!")
+
+    match_list = []
+    for db_match in user.matches:
+        match_entry = {}
+        match_entry["id"] = db_match.id
+        match_entry["win"] = db_match.winner
+        match_entry["enemyname"] = db_match.enemyname
+        match_entry["replay_url"] = db_match.replay_url
+
+        # Get user and enemy teams
+        usr_team, enemy_team = db_match.teams
+        match_entry["oppteam"] = [p.pokemon_name for p in enemy_team.pokemons]
+        match_entry["usr_picks"] = [p.pokemon_name for p in usr_team.pokemons if p.ispick]
+        match_entry["enemy_picks"] = [p.pokemon_name for p in enemy_team.pokemons if p.ispick]
+
+        # ELO data
+        match_entry["elo"] = [
+            db_match.p1_initial_elo, 
+            db_match.p1_final_elo, 
+            db_match.p2_initial_elo
+        ]
+
+        # Moves data
+        pokemon = [p for team in db_match.teams for p in team.pokemons]
+        match_entry["moves"] = {
+            p.pokemon_name: [
+                {"move_name": mu.move_name, "times_used": mu.times_used} for mu in p.move_usages
+            ]
+            for p in pokemon
+        }
+
+        # Additional fields
+        match_entry["terastallize"] = [False, False]  # Placeholder
+        match_entry["OTS"] = False  # Placeholder
+
+        match_list.append(match_entry)
+
+    return match_list
+
 def unpack_display_replay(replay):
+    """For debugging - prints the information of a parsed log """
     print("Player 1:", replay.players['p1'].name)
     print("ELO:", replay.players['p1'].elo)
     # prints each pokemon for player1's team, including moves, and defeated pokemon

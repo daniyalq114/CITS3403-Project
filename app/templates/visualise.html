@@ -23,8 +23,8 @@
     </form>
 
     {% if data_submitted %}
-      <h2>Username: {{ username }}</h2>
-      <p>PokéPaste: <a href="{{ pokepaste }}" target="_blank">{{ pokepaste }}</a></p>
+      <!-- <h2>Username: {{ username }}</h2>
+      <p>PokéPaste: <a href="{{ pokepaste }}" target="_blank">{{ pokepaste }}</a></p> -->
 
       <!-- Part 1 -->
       <p class="section-label">Part 1: Replay Record</p>
@@ -54,24 +54,24 @@
             </tr>
           </thead>
           <tbody>
-            {% for game in games %}
+            {% for game in parsed_logs %}
             <tr>
               <!-- Game number -->
               <td>{{ game.id }}</td>
               
               <!-- Win/Loss -->
-              <td class="{{ 'win' if game.win else 'loss' }}">
+              <td class="{{ 'win' if game['win'] == replay_username else 'loss' }}">
                 <b>{{ 'Win' if game.win else 'Loss' }}</b>
               </td>
 
               <!-- Replay Link -->
               <td>
-                <a href="{{ game.replay.search_request }}" target="_blank">View Replay</a>
+                <a href="{{ game['replay_url'] }}" target="_blank">View Replay</a>
               </td>
 
               <!-- Opposing Team -->
               <td class="sprites opp">
-                {% for pokemon in game.oppteam %}
+                {% for pokemon in game['oppteam'] %}
                   <span class="pokemon-name">{{ pokemon }}</span>
                   {% if not loop.last %}, {% endif %}
                 {% endfor %}
@@ -79,7 +79,7 @@
 
               <!-- Your Picks -->
               <td class="sprites pick">
-                {% for pokemon in game.usrpicks %}
+                {% for pokemon in game['usr_picks'] %}
                   <span class="pokemon-name">{{ pokemon }}</span>
                   {% if not loop.last %}, {% endif %}
                 {% endfor %}
@@ -87,18 +87,18 @@
 
               <!-- Their Picks -->
               <td class="sprites pick">
-                {% for pokemon in game.opppicks %}
+                {% for pokemon in game['enemy_picks'] %}
                   <span class="pokemon-name">{{ pokemon }}</span>
                   {% if not loop.last %}, {% endif %}
                 {% endfor %}
               </td>
 
               <!-- Rest of the columns -->
-              <td>{{ 'Yes' if game.Terastallize[0] else 'No' }}</td>
-              <td>{{ 'Yes' if game.Terastallize[1] else 'No' }}</td>
-              <td>{{ 'Yes' if game.OTS else 'No' }}</td>
-              <td>{{ game.ELO[1] }} <b>↑</b> {{ game.ELO[0] }}</td>
-              <td>{{ game.ELO[2] }}</td>
+              <td>{{ 'Yes' if game['terastallize'][0] else 'No' }}</td>
+              <td>{{ 'Yes' if game['terastallize'][1] else 'No' }}</td>
+              <td>{{ 'Yes' if game['OTS'] else 'No' }}</td>
+              <td>{{ game['elo'][1] }} <b>↑</b> {{ game['elo'][0] }}</td>
+              <td>{{game['elo'][2] }}</td>
             </tr>
             {% endfor %}
           </tbody>
@@ -115,11 +115,12 @@
       <!-- Part 3 -->
       <p class="section-label">Part 3: Move Usage</p>
       <div class="part3-container">
-        {% for pokemon, moves in move_data.items() %}
+        <!-- Fetch move data from most recent game -->
+        {% for pokemon in active_match['usr_picks'] %}
           <div class="part3 placeholder-table">
-            <h3>{{ pokemon }}</h3>
+            <h3>{{ pokemon.pokemon_name }}</h3>
             <ul>
-              {% for move, count in moves.items() %}
+              {% for move, count in active_match["moves"][pokemon.pokemon_name] %}
                 <li>{{ move }}: {{ count }}</li>
               {% endfor %}
             </ul>
@@ -129,7 +130,7 @@
 
       <!-- Hidden JSON data for JavaScript -->
       <script id="move-data" type="application/json">
-        {{ move_data | tojson }}
+        {{ active_match["moves"]| tojson }}
       </script>
     {% endif %}
   </div>

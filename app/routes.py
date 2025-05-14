@@ -17,6 +17,7 @@ def index():
 @main.route("/upload", methods=["GET", "POST"])
 @login_required
 def upload():
+    # need to also check that the showdown username isn't presently in use
     if request.method == "POST":
         # Read input from the form
         s_username = request.form.get("username", "").strip()
@@ -46,36 +47,42 @@ def upload():
 @main.route("/visualise", methods=["GET", "POST"])
 @login_required
 def visualise():
-    # username = session.get("username", "")
-    # pokepaste = session.get("pokepaste", "")
     replay_urls = session.get("replays", [])
-    # data_submitted = bool(replay_urls)
-    data_submitted = True
-    games = []
-    move_data = {}
-
+    data_submitted = bool(replay_urls)
+    
+    if request.method == "POST":
+        target = request.form.get("id", "")
+        data_submitted = True  # We want to visualise this user's games
+        if target:
+            parsed_logs = fetch_usr_matches_from_db(target)
+            active_match = parsed_logs[len(parsed_logs) - 1]
+            return render_template("visualise.html", 
+                                   parsed_logs=parsed_logs, 
+                                   data_submitted=data_submitted,
+                                   active_match=active_match)
+    
     if data_submitted:
-        # # Parse PokéPaste data
-        # pokepaste_parser = PokePasteParser()
-        # pokemon_data = pokepaste_parser.parse_pokepaste(pokepaste)
-        # pokepaste_parser.populate_sprites()
-        # Parse replays
-        # TODO prefil with None depending on the number of forms submitted
+        # Parse PokéPaste data
         for replay_url in replay_urls:
-            # try:
+            # Check if the replay URL already exists in the database
+            existing_match = Match.query.filter_by(replay_url=replay_url).first()
+            if existing_match:
+                flash(f"Replay {replay_url} has already been processed.", "info")
+                continue
+            
+            try:
                 parsed_log = ReplayLogParser(replay_url)
-                # writes relevant information to database
                 save_parsed_log_to_db(parsed_log, db, session["s_username"])
-                
-            # except Exception as e:
-            #     flash(f"Failed to process replay {replay_url}: {str(e)}", "error")
-            #     continue
-        # games = [] 
-        # fetch all matches associated with showdown user, and construct 'game' dicts to display
-        # on Jinja
-        # user = User.query.filter_by(username=session["user"]).first()
-        # print(user.matches)
-        return render_template("visualise.html")
+            except Exception as e:
+                flash(f"Failed to process replay {replay_url}: {str(e)}", "error")
+                continue
+            session.pop("replays", None)
+        parsed_logs = fetch_usr_matches_from_db(session["s_username"])
+        active_match = parsed_logs[len(parsed_logs) - 1]
+        return render_template("visualise.html",
+                               parsed_logs=parsed_logs,
+                               data_submitted=data_submitted, 
+                               active_match=active_match)
 
 @main.route("/network", methods=["GET", "POST"])
 @login_required
