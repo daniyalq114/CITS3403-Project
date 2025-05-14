@@ -18,7 +18,6 @@ def index():
 @login_required
 def upload():
     if request.method == "POST":
-        # Read input from the form
         s_username = request.form.get("username", "").strip()
         if "user" not in session:
             flash("You must be logged in to upload data.", "danger")
@@ -28,7 +27,7 @@ def upload():
         if not user:
             flash("User not found.", "danger")
             return redirect(url_for("main.login"))
-        # best practice would be to authenticate with pokemon showdown
+
         if user.showdown_username:
             if user.showdown_username != s_username:
                 flash(
@@ -40,16 +39,15 @@ def upload():
             user.showdown_username = s_username
             db.session.commit()
             flash("Showdown username updated successfully!", "success")
-        # add a `replays` field to the session containing all of the replay links
-        replays = [request.form.get(f"replay_{i}", "").strip() for i in range(40)]
-        replays = [replay for replay in replays if replay]  # Filter out empty inputs
-        session["replays"] = replays 
 
-        # Redirect to the visualise page
+        # Collect and store replays
+        replays = [request.form.get(f"replay_{i}", "").strip() for i in range(40)]
+        replays = [replay for replay in replays if replay]
+        session["replays"] = replays
+
         return redirect(url_for("main.visualise"))
 
     return render_template("upload.html", active="upload")
-
 
 @main.route("/visualise", methods=["GET", "POST"])
 @login_required
