@@ -19,14 +19,7 @@ def index():
 def upload():
     if request.method == "POST":
         s_username = request.form.get("username", "").strip()
-        if "user" not in session:
-            flash("You must be logged in to upload data.", "danger")
-            return redirect(url_for("main.login"))
-
-        user = User.query.filter_by(username=session["user"]).first()
-        if not user:
-            flash("User not found.", "danger")
-            return redirect(url_for("main.login"))
+        user = current_user
 
         if user.showdown_username:
             if user.showdown_username != s_username:
@@ -40,7 +33,6 @@ def upload():
             db.session.commit()
             flash("Showdown username updated successfully!", "success")
 
-        # Collect and store replays
         replays = [request.form.get(f"replay_{i}", "").strip() for i in range(40)]
         replays = [replay for replay in replays if replay]
         session["replays"] = replays
@@ -48,6 +40,7 @@ def upload():
         return redirect(url_for("main.visualise"))
 
     return render_template("upload.html", active="upload")
+
 
 @main.route("/visualise", methods=["GET", "POST"])
 @login_required
