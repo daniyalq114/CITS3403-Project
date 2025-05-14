@@ -55,3 +55,9 @@ class MoveUsage(db.Model):
     move_name = db.Column(db.String, nullable=False)  # Move name
     times_used = db.Column(db.Integer, default=0)  # Number of times the move was used
     team_pokemon = db.relationship("TeamPokemon", back_populates="move_usages")  # Back reference to TeamPokemon
+
+
+class SharedAccess(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    owner_username = db.Column(db.String, db.ForeignKey('user.username'), nullable=False)
+    shared_with_username = db.Column(db.String, db.ForeignKey('user.username'), nullable=False)
