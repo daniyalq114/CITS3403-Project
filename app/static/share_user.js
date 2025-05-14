@@ -4,35 +4,39 @@ document.addEventListener('DOMContentLoaded', function () {
   const datalist = document.getElementById('usernames');
 
   if (input && datalist) {
+    let debounceTimer;
     input.addEventListener('input', function () {
-      const query = input.value.toLowerCase();
-      datalist.innerHTML = '';
+      clearTimeout(debounceTimer);
+      debounceTimer = setTimeout(() => {
+        const query = input.value.toLowerCase();
+        datalist.innerHTML = '';
 
-      if (query.length >= 1) {
-        const matches = allUsernames
-          .filter(username =>
-            username.toLowerCase().includes(query) &&
-            !alreadyShared.includes(username)
-          )
-          .slice(0, 10); // Only show 10 matches
+        if (query.length >= 1) {
+          const matches = allUsernames
+            .filter(username =>
+              username.toLowerCase().includes(query) &&
+              !alreadyShared.includes(username)
+            )
+            .slice(0, 10);
 
-        // Hide if only exact match remains
-        if (matches.length === 1 && matches[0].toLowerCase() === query) {
+          if (matches.length === 1 && matches[0].toLowerCase() === query) {
+            input.removeAttribute('list');
+            return;
+          }
+
+          input.setAttribute('list', 'usernames');
+
+          for (const name of matches) {
+            const option = document.createElement('option');
+            option.value = name;
+            datalist.appendChild(option);
+          }
+        } else {
           input.removeAttribute('list');
-          return;
         }
-
-        input.setAttribute('list', 'usernames');
-
-        for (const name of matches) {
-          const option = document.createElement('option');
-          option.value = name;
-          datalist.appendChild(option);
-        }
-      } else {
-        input.removeAttribute('list');
-      }
+      }, 300); // 300ms debounce delay
     });
+
   }
 
   if (!form) return;
