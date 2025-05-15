@@ -53,6 +53,12 @@ def visualise():
     games = []
     move_data = {}
 
+    # get users who shared with current user for search bar
+    shared_users = [
+        s.owner_username
+        for s in SharedAccess.query.filter_by(shared_with_username=current_user.username).all()
+    ]
+
     # handle shared user selection (POST request)
     if request.method == "POST":
         if request.form.get("clear_shared_user"):
@@ -62,9 +68,20 @@ def visualise():
 
         shared_username = request.form.get("shared_user")
         if shared_username:
-            session["shared_username"] = shared_username
-            flash(f"You are viewing data shared by {shared_username}.", "success")
-            return redirect(url_for("main.visualise"))
+            shared_username = shared_username.strip()
+
+            if shared_username == current_user.username:
+                session.pop("shared_username", None)
+                flash("You are viewing your own data.", "success")
+                return redirect(url_for("main.visualise"))
+
+            elif shared_username in shared_users:
+                session["shared_username"] = shared_username
+                flash(f"You are viewing data shared by {shared_username}.", "success")
+                return redirect(url_for("main.visualise"))
+            else:
+                flash("Invalid selection: You do not have access to this user's data.", "error")
+                return redirect(url_for("main.visualise"))
 
     # determine which user's data to load (default to self)
     selected_user = session.get("shared_username", current_user.username)
@@ -90,12 +107,6 @@ def visualise():
         # on Jinja
         # user = User.query.filter_by(username=session["user"]).first()
         # print(user.matches)
-
-    # get users who shared with current user for search bar
-    shared_users = [
-        s.owner_username
-        for s in SharedAccess.query.filter_by(shared_with_username=current_user.username).all()
-    ]
 
     return render_template("visualise.html", active="visualise", shared_with=shared_users)
 

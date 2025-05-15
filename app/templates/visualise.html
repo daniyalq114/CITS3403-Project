@@ -5,6 +5,7 @@
   <h1>Visualise your Battle Performance</h1>
   <p>Enter the username of someone whose data you'd like to view instead of yours:</p>
 
+  {# Show flash messages just below the prompt #}
   {% with messages = get_flashed_messages(with_categories=true) %}
     {% if messages %}
       <ul class="flashes">
@@ -37,9 +38,9 @@
     const sharedUsernames = {{ shared_with|tojson }};
   </script>
   <script src="{{ url_for('static', filename='select_shared_user.js') }}"></script>
-      <!-- Existing visualisation display (graphs, stats, etc.) will go here -->
 
-    </div>
+  <!-- Existing visualisation display (graphs, stats, etc.) will go here -->
+  </div>
   </div>
 </div>
 {% endblock %}
