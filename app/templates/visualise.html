@@ -1,138 +1,45 @@
 {% extends "base.html" %}
+{% set suppress_flashes = true %}
 
 {% block content %}
-  <div class="content">
-    <h1>Visualise your Replays</h1>
+  <h1>Visualise your Battle Performance</h1>
+  <p>Enter the username of someone whose data you'd like to view instead of yours:</p>
 
-    <form action="{{ url_for('main.visualise') }}" method="post" class="visualise-form">
-      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-      <label for="username">
-        Enter the Pokémon Showdown username whose report you want to view
-      </label>
-      <div class="form-inline">
-        <input
-          type="text"
-          id="username"
-          name="username"
-          value="{{ username }}"
-          required
-          placeholder="username"
-        >
-        <button type="submit" class="btn">Submit</button>
-      </div>
-    </form>
-
-    {% if data_submitted %}
-      <h2>Username: {{ username }}</h2>
-      <p>PokéPaste: <a href="{{ pokepaste }}" target="_blank">{{ pokepaste }}</a></p>
-
-      <!-- Part 1 -->
-      <p class="section-label">Part 1: Replay Record</p>
-      <div class="table-responsive">
-        <table class="replay-record placeholder-table table-striped">
-          <thead>
-            <!-- First heading row -->
-            <tr>
-              <th colspan="6">Game Details</th> <!-- Grouping Game, Result, Replay Links, Opposing Team, Your Picks -->
-              <th colspan="2">Terastallize</th>
-              <th>OTS?</th>
-              <th colspan="2">ELO</th>
-            </tr>
-            <!-- Second heading row -->
-            <tr>
-              <th>Game</th>
-              <th>Result</th>
-              <th>Replay Links</th>
-              <th>Opposing Team</th>
-              <th>Your Picks</th>
-              <th>Their Picks</th>
-              <th>You</th>
-              <th>Opp</th>
-              <th></th>
-              <th>You</th>
-              <th>Opp</th>
-            </tr>
-          </thead>
-          <tbody>
-            {% for game in games %}
-            <tr>
-              <!-- Game number -->
-              <td>{{ game.id }}</td>
-              
-              <!-- Win/Loss -->
-              <td class="{{ 'win' if game.win else 'loss' }}">
-                <b>{{ 'Win' if game.win else 'Loss' }}</b>
-              </td>
-
-              <!-- Replay Link -->
-              <td>
-                <a href="{{ game.replay.search_request }}" target="_blank">View Replay</a>
-              </td>
-
-              <!-- Opposing Team -->
-              <td class="sprites opp">
-                {% for pokemon in game.oppteam %}
-                  <span class="pokemon-name">{{ pokemon }}</span>
-                  {% if not loop.last %}, {% endif %}
-                {% endfor %}
-              </td>
-
-              <!-- Your Picks -->
-              <td class="sprites pick">
-                {% for pokemon in game.usrpicks %}
-                  <span class="pokemon-name">{{ pokemon }}</span>
-                  {% if not loop.last %}, {% endif %}
-                {% endfor %}
-              </td>
-
-              <!-- Their Picks -->
-              <td class="sprites pick">
-                {% for pokemon in game.opppicks %}
-                  <span class="pokemon-name">{{ pokemon }}</span>
-                  {% if not loop.last %}, {% endif %}
-                {% endfor %}
-              </td>
-
-              <!-- Rest of the columns -->
-              <td>{{ 'Yes' if game.Terastallize[0] else 'No' }}</td>
-              <td>{{ 'Yes' if game.Terastallize[1] else 'No' }}</td>
-              <td>{{ 'Yes' if game.OTS else 'No' }}</td>
-              <td>{{ game.ELO[1] }} <b>↑</b> {{ game.ELO[0] }}</td>
-              <td>{{ game.ELO[2] }}</td>
-            </tr>
-            {% endfor %}
-          </tbody>
-        </table>
-      </div>
-
-      <!-- Part 2 -->
-      <p class="section-label">Part 2: Individual Pokémon Data</p>
-      <div class="part2-container">
-        <div class="placeholder-table part2"></div>
-        <div class="placeholder-table part2"></div>
-      </div>
-
-      <!-- Part 3 -->
-      <p class="section-label">Part 3: Move Usage</p>
-      <div class="part3-container">
-        {% for pokemon, moves in move_data.items() %}
-          <div class="part3 placeholder-table">
-            <h3>{{ pokemon }}</h3>
-            <ul>
-              {% for move, count in moves.items() %}
-                <li>{{ move }}: {{ count }}</li>
-              {% endfor %}
-            </ul>
-          </div>
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      <ul class="flashes">
+        {% for category, message in messages %}
+          <li class="flash {{ category }}">{{ message }}</li>
         {% endfor %}
-      </div>
-
-      <!-- Hidden JSON data for JavaScript -->
-      <script id="move-data" type="application/json">
-        {{ move_data | tojson }}
-      </script>
+      </ul>
     {% endif %}
+  {% endwith %}
+
+  <form method="post" action="{{ url_for('main.visualise') }}" class="network-form mb-2">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <input list="usernames" name="shared_user" placeholder="Search shared user..." required>
+    <datalist id="usernames">
+      {% for u in shared_with %}
+        <option value="{{ u }}">
+      {% endfor %}
+    </datalist>
+    <button type="submit" class="btn">View Shared Data</button>
+  </form>
+
+  <form method="post" action="{{ url_for('main.visualise') }}" class="network-form mb-4">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <input type="hidden" name="clear_shared_user" value="true">
+    <button type="submit" class="btn btn-outline-secondary">View Your Own Data</button>
+  </form>
+
+  <script>
+    // This makes `sharedUsernames` available in JS
+    const sharedUsernames = {{ shared_with|tojson }};
+  </script>
+  <script src="{{ url_for('static', filename='select_shared_user.js') }}"></script>
+      <!-- Existing visualisation display (graphs, stats, etc.) will go here -->
+
+    </div>
   </div>
+</div>
 {% endblock %}
-
-

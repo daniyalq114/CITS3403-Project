@@ -29,6 +29,7 @@ This assumes pokemon will not have empty names or names containing the char '|'.
 import requests
 from app.models import *
 from dataclasses import dataclass, field
+from flask_login import current_user
 
 @dataclass
 class Pokemon:
@@ -160,7 +161,7 @@ class ReplayLogParser:
 def save_parsed_log_to_db(parsed_log, db):
     players = parsed_log.players
     match = Match(
-        user_id=session["user"], # showdown name FK - links match to user
+        user_id=current_user.username,  # showdown name FK - links match to user
         # to store half as much data (when the opposing player submits their matches), have enemyname be another FK
         enemyname=players['p2'].name,
         teams=[]  # Teams will be added later

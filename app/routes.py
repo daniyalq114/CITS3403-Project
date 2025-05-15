@@ -53,6 +53,23 @@ def visualise():
     games = []
     move_data = {}
 
+    # handle shared user selection (POST request)
+    if request.method == "POST":
+        if request.form.get("clear_shared_user"):
+            session.pop("shared_username", None)
+            flash("You are viewing your own data.", "success")
+            return redirect(url_for("main.visualise"))
+
+        shared_username = request.form.get("shared_user")
+        if shared_username:
+            session["shared_username"] = shared_username
+            flash(f"You are viewing data shared by {shared_username}.", "success")
+            return redirect(url_for("main.visualise"))
+
+    # determine which user's data to load (default to self)
+    selected_user = session.get("shared_username", current_user.username)
+    user = User.query.filter_by(username=selected_user).first()
+
     if data_submitted:
         # # Parse PokéPaste data
         # pokepaste_parser = PokePasteParser()
@@ -65,7 +82,6 @@ def visualise():
                 parsed_log = ReplayLogParser(replay_url)
                 # writes relevant information to database
                 save_parsed_log_to_db(parsed_log, db)
-                
             # except Exception as e:
             #     flash(f"Failed to process replay {replay_url}: {str(e)}", "error")
             #     continue
@@ -74,7 +90,15 @@ def visualise():
         # on Jinja
         # user = User.query.filter_by(username=session["user"]).first()
         # print(user.matches)
-        return render_template("visualise.html")
+
+    # get users who shared with current user for search bar
+    shared_users = [
+        s.owner_username
+        for s in SharedAccess.query.filter_by(shared_with_username=current_user.username).all()
+    ]
+
+    return render_template("visualise.html", active="visualise", shared_with=shared_users)
+
 
 @main.route("/network", methods=["GET", "POST"])
 @login_required
@@ -160,3 +184,23 @@ def logout():
     flash("Logged out.", "info")
     return redirect(url_for("main.index"))
 
+@main.route("/set_shared_user", methods=["POST"])
+@login_required
+def set_shared_user():
+    data = request.get_json()
+    username = data.get("username", "").strip()
+
+    if not username:
+        return jsonify({"success": False, "message": "No user provided."})
+
+    # Validate that the current user has access to this shared username
+    access = SharedAccess.query.filter_by(
+        owner_username=username,
+        shared_with_username=current_user.username
+    ).first()
+
+    if access:
+        session["shared_username"] = username
+        return jsonify({"success": True})
+    else:
+        return jsonify({"success": False, "message": "You do not have access to this user."})
