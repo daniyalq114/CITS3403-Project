@@ -4,7 +4,6 @@ from flask import url_for
 from app import create_app, db
 from config import TestConfig
 from app.models import User, Match, Team, TeamPokemon, MoveUsage
-from app import add_test_data_to_db
 
 class UserModelCase(unittest.TestCase):
     def setUp(self):
@@ -52,7 +51,6 @@ class RoutesTestCase(unittest.TestCase):
         self.app_context.push()
         self.client = self.app.test_client()
         db.create_all()
-        add_test_data_to_db()
 
     def tearDown(self):
         db.session.remove()

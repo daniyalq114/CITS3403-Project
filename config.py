@@ -13,3 +13,5 @@ class DeploymentConfig(Config):
 class TestConfig(Config):
     SQLALCHEMY_DATABASE_URI = "sqlite:///:memory:"
     TESTING = True
+    SECRET_KEY = 'test-secret-key'  # Add this line
+    WTF_CSRF_ENABLED = False  # Add this to disable CSRF in testing
