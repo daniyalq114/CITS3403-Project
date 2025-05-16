@@ -43,6 +43,8 @@ class UserModelCase(unittest.TestCase):
         self.assertFalse(u.check_password("geodude"))
         self.assertTrue(u.check_password("onix"))
 
+# I want to write tests for the data generations and sharing, but need to wait for that to be done first
+
 class RoutesTestCase(unittest.TestCase):
     def setUp(self):
         self.app = create_app(TestConfig)
