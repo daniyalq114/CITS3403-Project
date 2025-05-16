@@ -89,24 +89,24 @@
               <!-- Opposing Team -->
               <td class="sprites opp">
                 {% for pokemon in game['oppteam'] %}
-                  <span class="pokemon-name">{{ pokemon }}</span>
-                  {% if not loop.last %}, {% endif %}
+                  <span class="pokemon-name"><img src="{{ pokemon[0] }}" alt="{{ pokemon[1] }}"></span>
+                  {% if not loop.last %} {% endif %}
                 {% endfor %}
               </td>
 
               <!-- Your Picks -->
               <td class="sprites pick">
                 {% for pokemon in game['usr_picks'] %}
-                  <span class="pokemon-name">{{ pokemon }}</span>
-                  {% if not loop.last %}, {% endif %}
+                  <span class="pokemon-name"><img src="{{ pokemon[0] }}" alt="{{ pokemon[1] }}"></span>
+                  {% if not loop.last %} {% endif %}
                 {% endfor %}
               </td>
 
               <!-- Their Picks -->
               <td class="sprites pick">
                 {% for pokemon in game['enemy_picks'] %}
-                  <span class="pokemon-name">{{ pokemon }}</span>
-                  {% if not loop.last %}, {% endif %}
+                  <span class="pokemon-name"><img src="{{ pokemon[0] }}" alt="{{ pokemon[1] }}"></span>
+                  {% if not loop.last %} {% endif %}
                 {% endfor %}
               </td>
 

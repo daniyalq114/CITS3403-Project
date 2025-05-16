@@ -29,6 +29,7 @@ This assumes pokemon will not have empty names or names containing the char '|'.
 import requests
 from app.models import *
 from dataclasses import dataclass, field
+from app.sprite_cache import sprite_cache
 @dataclass
 class Pokemon:
     name: str = ""
@@ -117,6 +118,7 @@ class ReplayLogParser:
                         temp.wins = t[pokemon_name].wins
                         t.pop(pokemon_name)
                         t[nickname] = temp
+                        t[nickname].name = pokemon_name # the actual name of the pokemon
                     # adds the pokemon to the 'picks' set of e.g. players['p1']
                     self.players[active_p_num[:2]].picks.add(nickname)
 
@@ -166,6 +168,7 @@ class ReplayLogParser:
                     pokemon_name = line[3].split(',')[0].strip()  
                     if pokemon_name:  # Ensure the name is not empty or None - no funny business
                         self.players[line[2]].team.setdefault(pokemon_name, Pokemon())
+                        self.players[line[2]].team[pokemon_name].name = pokemon_name
 
     def handleGameEnd(self):
         """Handles log content after the 'win' statement is encountered.
@@ -211,11 +214,12 @@ def save_parsed_log_to_db(parsed_log, db, username):
         db.session.commit()
 
         # Add Pokémon to the team
-        for pokemon_name, pokemon_data in players[team_key].team.items():
+        for nickname, pokemon_data in players[team_key].team.items():
             team_pokemon = TeamPokemon(
                 team_id=team.id,
-                pokemon_name=pokemon_name, # I hope this works for weirdly nicknamed things
-                ispick=True if pokemon_name in players[team_key].picks else False,
+                nickname=nickname, 
+                pokemon_name=pokemon_data.name,
+                ispick=True if nickname in players[team_key].picks else False,
                 wins=pokemon_data.wins,
                 defeated=pokemon_data.defeated
             )
@@ -263,9 +267,20 @@ def fetch_usr_matches_from_db(username):
 
         # Get user and enemy teams
         usr_team, enemy_team = db_match.teams
-        match_entry["oppteam"] = [p.pokemon_name for p in enemy_team.pokemons]
-        match_entry["usr_picks"] = [p.pokemon_name for p in usr_team.pokemons if p.ispick]
-        match_entry["enemy_picks"] = [p.pokemon_name for p in enemy_team.pokemons if p.ispick]
+
+        # Get sprite URLs for all Pokémon, preserving nicknames
+        match_entry["oppteam"] = [
+            (sprite_cache.get_sprite_url(p.pokemon_name), p.nickname if p.nickname else p.pokemon_name)
+            for p in enemy_team.pokemons
+        ]
+        match_entry["usr_picks"] = [
+            (sprite_cache.get_sprite_url(p.pokemon_name), p.nickname if p.nickname else p.pokemon_name)
+            for p in usr_team.pokemons if p.ispick
+        ]
+        match_entry["enemy_picks"] = [
+            (sprite_cache.get_sprite_url(p.pokemon_name), p.nickname if p.nickname else p.pokemon_name)
+            for p in enemy_team.pokemons if p.ispick
+        ]
 
         # ELO data
         match_entry["elo"] = [
@@ -317,6 +332,7 @@ def fetch_pokemon_data_for_usr(username, active_match_id):
             cur_poke["wins"] += pokemon.wins
             cur_poke["losses"] += int(pokemon.defeated)
             cur_poke["matches_won"] += won
+            cur_poke["truename"] =  pokemon.pokemon_name
     return poke_dict
 
 def unpack_display_replay(replay):
