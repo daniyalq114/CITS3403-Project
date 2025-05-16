@@ -53,7 +53,7 @@ class TeamPokemon(db.Model):
     ispick = db.Column(db.Boolean)
     wins = db.Column(db.Integer)
     defeated = db.Column(db.Boolean)
-    # nickname = db.Column(db.String)  # Optional nickname
+    nickname = db.Column(db.String)  # Optional nickname
     # position = db.Column(db.Integer)  # Optional position (e.g., 1-6)
     team = db.relationship("Team", back_populates="pokemons")  # Back reference to Team
     move_usages = db.relationship("MoveUsage", back_populates="team_pokemon", cascade="all, delete-orphan")  # Cascade delete

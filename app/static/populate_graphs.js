@@ -41,13 +41,12 @@ document.addEventListener("DOMContentLoaded", function() {
 
       // Get the match id from the data attribute
       const matchId = this.getAttribute("data-match-id");
+      console.log("Clicked row, matchId:", matchId);
       if (matchId) {
-        // AJAX GET request to the server
         fetch(`/visualise/match_data/${matchId}`)
           .then(response => response.json())
           .then(data => {
-            // Call your graph population function with the new data
-            // drawPartThree(data);
+            console.log("Fetched data for match:", data);
             drawPartTwo(data); 
             drawPartThree(data);
           });
