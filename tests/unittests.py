@@ -1,9 +1,8 @@
 import unittest
-
 from flask import url_for
 from app import create_app, db
 from config import TestConfig
-from app.models import User, Match, Team, TeamPokemon, MoveUsage
+from app.models import User, Match, Team, TeamPokemon, MoveUsage, SharedAccess  
 
 class UserModelCase(unittest.TestCase):
     def setUp(self):
@@ -41,8 +40,6 @@ class UserModelCase(unittest.TestCase):
         u.set_password("onix")
         self.assertFalse(u.check_password("geodude"))
         self.assertTrue(u.check_password("onix"))
-
-# I want to write tests for the data generations and sharing, but need to wait for that to be done first
 
 class RoutesTestCase(unittest.TestCase):
     def setUp(self):
