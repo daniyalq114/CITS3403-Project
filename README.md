@@ -106,7 +106,7 @@ PYTHONPATH=$PYTHONPATH:. python3 -m unittest tests/unittests.py -v
 
 To run selenium tests, run the following command in the root directory:
 ``` shell
-
+PYTHONPATH=$PYTHONPATH:. python3 -m unittest tests/systemtests.py -v
 ```
 
 ## Credits
