@@ -29,6 +29,12 @@ A HTML parser processes the replay data to extract game results and performance 
 **Visual Analysis:**
 Charts and summaries display win/loss ratios, ELO fluctuations, move usage statistics, and more.
 
+**Technologies Used:**
+Frontend: HTML, CSS, Bootstrap, JavaScript 
+Backend: Flask (for routing and processing)
+Database: SQLite (via SQLAlchemy)
+APIs and Parsing: Custom HTML parser for battle replay data
+Version Control: Git and GitHub for collaborative development
 
 ### Running the test site
 1. Navigate to the directory you'd like to store LugiAnalytics, for instance:
@@ -96,13 +102,6 @@ When you're done, exit the virtual environment with `deactivate`
 
 
 ## Credits
-
-**Technologies Used:**
-Frontend: HTML, CSS, Bootstrap, JavaScript 
-Backend: Flask (for routing and processing)
-Database: SQLite (via SQLAlchemy)
-APIs and Parsing: Custom HTML parser for battle replay data
-Version Control: Git and GitHub for collaborative development
 
 **AI Assistance**  
 Portions of this project were developed with the assistance of AI tools for code suggestions, debugging, and documentation refinement:
