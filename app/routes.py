@@ -64,6 +64,7 @@ def visualise():
         if request.form.get("clear_shared_user"):
             session.pop("shared_username", None)
             flash("You are viewing your own data.", "success")
+            update_vis_session(current_user.username)
             return redirect(url_for("main.visualise"))
         shared_username = request.form.get("shared_user")
         if shared_username:
@@ -72,6 +73,7 @@ def visualise():
             if shared_username == current_user.username:
                 session.pop("shared_username", None)
                 flash("You are viewing your own data.", "success")
+                update_vis_session(current_user.username)
 
             elif shared_username in shared_users:
                 session["shared_username"] = shared_username
@@ -83,10 +85,10 @@ def visualise():
                 return redirect(url_for("main.visualise"))
             
         # update active logs to those of new user  
-        if shared_username and User.query.filter_by(showdown_username=shared_username).first(): 
+        if shared_username and User.query.filter_by(username=shared_username).first(): 
             update_vis_session(shared_username)
 
-        elif not User.query.filter_by(showdown_username=shared_username):
+        elif not User.query.filter_by(username=shared_username):
             flash(f"Whoops, looks like no replays have been submitted for user {shared_username}!", "error")
 
     elif data_submitted: # data has just been submitted via upload page
@@ -107,13 +109,13 @@ def visualise():
         session.pop("replays", None) 
         update_vis_session(current_user.username)
 
-    elif "parsed_logs" not in session and current_user.username:
+    elif "parsed_logs" not in session and current_user.showdown_username:
         # no information parsed yet in this session, however the user
         # has submitted data before
         update_vis_session(current_user.username)
 
     #demorgans babyyy
-    if not (data_submitted or current_user.username): 
+    if not (data_submitted or current_user.showdown_username): 
         # user has not submitted and doesn't have a showdown_username
         return render_template("visualise.html", 
                             parsed_logs=[], 
