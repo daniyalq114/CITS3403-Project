@@ -3,9 +3,10 @@ function nrand() {
     return Math.floor(Math.random() * 5);
 }
 
-// if(document.URL.includes("visualise")) {
-//     google.charts.setOnLoadCallback(drawPartThree);
-// }
+if(document.URL.includes("visualise")) {
+    google.charts.setOnLoadCallback(drawPartThree);
+}
+
 
 document.addEventListener("DOMContentLoaded", function() {
   const default_activeScript = document.getElementById("default-active-match");
@@ -28,6 +29,7 @@ document.addEventListener("DOMContentLoaded", function() {
             // drawPartThree(data);
             console.log("data:", data)
             drawPartTwo(data)
+            drawPartThree(data)
           });
     } catch (e) {
       console.error("Failed to parse pokemon data JSON:", e);
@@ -50,6 +52,7 @@ document.addEventListener("DOMContentLoaded", function() {
             // Call your graph population function with the new data
             // drawPartThree(data);
             drawPartTwo(data); 
+            drawPartThree(data);
           });
       }
     });
@@ -82,24 +85,27 @@ function drawPartThree(poke_dict) {
     const container = document.querySelector(".part3-container");
     container.innerHTML = ""; // Clear previous graphs
 
-    for (const [pokemon, moves] of Object.entries(poke_dict)) {
-        const graphDiv = document.createElement("div");
-        graphDiv.className = "part3 placeholder-table";
-        container.appendChild(graphDiv);
-
+    for (const pokemon in poke_dict) {
         const moveArray = [["Move", "Usage"]];
-        for (const [move, count] of Object.entries(moves)) {
-            moveArray.push([move, count]);
+        const moves = poke_dict[pokemon].moves;
+        for (const move in moves) {
+            moveArray.push([move, moves[move]]);
         }
 
-        const data = google.visualization.arrayToDataTable(moveArray);
-        const options = {
-            title: pokemon,
-            is3D: true,
-            colors: ["#90caf9", "#ff6b6b", "#ffcc80", "#a5d6a7"],
-        };
+        // Only draw chart if there are moves
+        if (moveArray.length > 1) {
+            const data = google.visualization.arrayToDataTable(moveArray);
+            const options = {
+                title: pokemon,
+                is3D: true,
+                colors: ["#90caf9", "#ff6b6b", "#ffcc80", "#a5d6a7"],
+            };
+            const graphDiv = document.createElement("div");
+            graphDiv.className = "part3 placeholder-table";
+            container.appendChild(graphDiv);
 
-        const chart = new google.visualization.PieChart(graphDiv);
-        chart.draw(data, options);
+            const chart = new google.visualization.PieChart(graphDiv);
+            chart.draw(data, options);
+        } 
     }
 }
