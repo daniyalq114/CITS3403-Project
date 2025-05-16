@@ -308,13 +308,12 @@ def fetch_pokemon_data_for_usr(showdown_username, active_match_id):
             # we only care about pokemon in the active match
             if pokemon.pokemon_name not in target_pokemon: continue
             # construct dict if pokemon not already in poke_dict
-            poke_dict[pokemon.pokemon_name] = poke_dict.get(
-                pokemon, {"moves":{}, "wins":0, "losses":0, "matches_won":0}
-            )
+            if pokemon.pokemon_name not in poke_dict:
+                poke_dict[pokemon.pokemon_name] = {"moves":{}, "wins":0, "losses":0, "matches_won":0}
             # construct or increment values for the active pokemon
             cur_poke = poke_dict[pokemon.pokemon_name]
             for mu in pokemon.move_usages: # add moves or increment move counts on existing moves
-                cur_poke["moves"] = cur_poke["moves"].get(mu.move_name, 0) + mu.times_used 
+                cur_poke["moves"][mu.move_name] = cur_poke["moves"].get(mu.move_name, 0) + mu.times_used
             cur_poke["wins"] += pokemon.wins
             cur_poke["losses"] += int(pokemon.defeated)
             cur_poke["matches_won"] += won

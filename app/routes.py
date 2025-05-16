@@ -170,5 +170,4 @@ def visualise_match_data(match_id):
     # Use the current user's showdown_username for security
     showdown_username = current_user.showdown_username
     data = fetch_pokemon_data_for_usr(showdown_username, match_id)
-    print(data)
     return jsonify(data)

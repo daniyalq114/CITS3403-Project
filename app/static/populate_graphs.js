@@ -49,7 +49,7 @@ document.addEventListener("DOMContentLoaded", function() {
           .then(data => {
             // Call your graph population function with the new data
             // drawPartThree(data);
-            drawPartTwo(matchId)
+            drawPartTwo(data); 
           });
       }
     });
@@ -57,33 +57,49 @@ document.addEventListener("DOMContentLoaded", function() {
 });
 
 function drawPartTwo(poke_dict) {
-    let part2_body = document.querySelectorAll(".part2 > tbody")
-
+    let part2_body = document.querySelectorAll(".part2-container .part2 > tbody");
+    // Row follows format <td><img></td> <td>pokemon defeated to losses</td> <td>games won</td>
+    var part2_table_contents = "";
+    for (const pokemonName in poke_dict) {
+        if (poke_dict.hasOwnProperty(pokemonName)) {
+            const pokeData = poke_dict[pokemonName];
+            // Example: add a row for each pokemon
+            part2_table_contents += `<tr>
+                <td>${pokemonName}</td>
+                <td>${pokeData.wins}</td>
+                <td>${pokeData.losses}</td>
+                <td>${pokeData.wins/pokeData.losses}%</td>
+                <td>${pokeData.matches_won}</td>
+            </tr>`;
+        }
+    }
+    // Set the table body HTML
+    part2_body.forEach(tb => tb.innerHTML = part2_table_contents);
 }
 
 // Modify drawPartThree to accept data as an argument
-// function drawPartThree(poke_dict) {
-//     const container = document.querySelector(".part3-container");
-//     container.innerHTML = ""; // Clear previous graphs
+function drawPartThree(poke_dict) {
+    const container = document.querySelector(".part3-container");
+    container.innerHTML = ""; // Clear previous graphs
 
-//     for (const [pokemon, moves] of Object.entries(poke_dict)) {
-//         const graphDiv = document.createElement("div");
-//         graphDiv.className = "part3 placeholder-table";
-//         container.appendChild(graphDiv);
+    for (const [pokemon, moves] of Object.entries(poke_dict)) {
+        const graphDiv = document.createElement("div");
+        graphDiv.className = "part3 placeholder-table";
+        container.appendChild(graphDiv);
 
-//         const moveArray = [["Move", "Usage"]];
-//         for (const [move, count] of Object.entries(moves)) {
-//             moveArray.push([move, count]);
-//         }
+        const moveArray = [["Move", "Usage"]];
+        for (const [move, count] of Object.entries(moves)) {
+            moveArray.push([move, count]);
+        }
 
-//         const data = google.visualization.arrayToDataTable(moveArray);
-//         const options = {
-//             title: pokemon,
-//             is3D: true,
-//             colors: ["#90caf9", "#ff6b6b", "#ffcc80", "#a5d6a7"],
-//         };
+        const data = google.visualization.arrayToDataTable(moveArray);
+        const options = {
+            title: pokemon,
+            is3D: true,
+            colors: ["#90caf9", "#ff6b6b", "#ffcc80", "#a5d6a7"],
+        };
 
-//         const chart = new google.visualization.PieChart(graphDiv);
-//         chart.draw(data, options);
-//     }
-// }
+        const chart = new google.visualization.PieChart(graphDiv);
+        chart.draw(data, options);
+    }
+}
