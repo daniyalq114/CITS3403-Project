@@ -70,9 +70,15 @@ function drawPartTwo(poke_dict) {
             part2_table_contents += `<tr>
                 <td>${pokemonName}</td>
                 <td>${pokeData.wins}</td>
-                <td>${pokeData.losses}</td>
-                <td>${pokeData.wins/pokeData.losses}%</td>
-                <td>${pokeData.matches_won}</td>
+                <td>${pokeData.losses}</td>`
+            var per_str = ""
+            if (pokeData.wins > 0 && pokeData.losses == 0)
+                part2_table_contents += `<td>${pokeData.wins}</td>`
+            else if (pokeData.wins == 0 && pokeData.losses == 0)
+                part2_table_contents += `<td>N/A</td>`
+            else
+                part2_table_contents += `<td>${pokeData.wins/pokeData.losses}</td>`
+            part2_table_contents += `<td>${pokeData.matches_won}</td>
             </tr>`;
         }
     }

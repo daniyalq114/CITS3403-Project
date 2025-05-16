@@ -497,12 +497,25 @@ body {
 /* Part 3: grid of 4 usage charts */
 .part3-container {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
   gap: 1rem;
   margin-bottom: 2rem;
+  justify-items: center; /* Center the charts in their grid cells */
 }
 .placeholder-table.part3 {
+  width: 325px;
+  max-width: 100%;
+  min-width: 180px;
   height: 180px;
+  margin: 0 auto;
+  background: #fff;
+  border-radius: 8px;
+  box-sizing: border-box;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 }
 
 /* Replay Record Table */
