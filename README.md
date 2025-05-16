@@ -8,12 +8,6 @@
 | 23360799 | Sam Jackson           | samjjacko       |
 | 21480994 | Cam Luketina-Clarke   | Drummonddo      |
 
-
-
-Bootstrap: https://getbootstrap.com/docs/5.0/components/dropdowns/
-
-https://themewagon.com/themes/free-bootstrap-5-admin-dashboard-template-darkpan/
-
 ## LugiAnalytics - a Pokémon Battle Analysis Tool
 LugiAnalytics is a web-based tool designed specifically for competitive Pokémon players. The site allows users to:
 
@@ -24,21 +18,16 @@ Visualise performance metrics using interactive charts and summaries, helping pl
 ### Features
 **User Input:**
 Enter your Showdown username.
-Submit your team via a Pokepaste link.
 Provide battle replay links for analysis.
 
+**Sharing:**
+Share your data with other users.
+
 **Data Extraction:**
-An HTML parser processes the replay data to extract game results and performance metrics.
+A HTML parser processes the replay data to extract game results and performance metrics.
 
 **Visual Analysis:**
 Charts and summaries display win/loss ratios, ELO fluctuations, move usage statistics, and more.
-
-**Technologies Used:**
-Frontend: HTML, CSS, Bootstrap, JavaScript 
-Backend: Flask (for routing and processing)
-Database: SQLite (via SQLAlchemy)
-APIs and Parsing: Custom HTML parser for battle replay data
-Version Control: Git and GitHub for collaborative development
 
 
 ### Running the test site
@@ -74,30 +63,60 @@ pip install -r requirements.txt
 ```
 7. Set up the database
 ```shell
+mkdir -p instance # create instance folder if required
 flask db init # initialise database
 flask db migrate # set up the database to follow schema in models.py
 flask db upgrade # apply the migration to the database
 ```
 8. Run LugiAnalytics
-`pip install -r requirements.txt`
-
-7. Set the Flask application environment variable:
+```shell
+pip install -r requirements.txt
+```
+9. Set the Flask application environment variable:
 
     | Platform | Shell      | Command                     |
     | -------- | ---------- | --------------------------- |
     | POSIX    | bash/zsh   | `export FLASK_APP=app.py`   |
     | Windows  | Powershell | `$env:FLASK_APP = "app.py"` |
 
-8. Set the Flask secret key (replace 'your-very-secret-key' with a real random string when deploying):
+10. Set the Flask secret key (replace 'your-very-secret-key' with a real random string when deploying):
 
     | Platform | Shell      | Command                                    |
     | -------- | ---------- | ------------------------------------------ |
     | POSIX    | bash/zsh   | `export SECRET_KEY='your-very-secret-key'` |
     | Windows  | Powershell | `$env:SECRET_KEY = "your-very-secret-key"` |
 
-9. Run LugiAnalytics
+11. Run LugiAnalytics
+```shell
 `flask run`
-
-10. Open the returned url, e.g. for `* Running on http://127.0.0.1:5000` open `http://127.0.0.1:5000` in your browser. 
+```
+12. Open the returned url, e.g. for `* Running on http://127.0.0.1:5000` open `http://127.0.0.1:5000` in your browser. 
 
 When you're done, exit the virtual environment with `deactivate`
+
+
+## Credits
+
+**Technologies Used:**
+Frontend: HTML, CSS, Bootstrap, JavaScript 
+Backend: Flask (for routing and processing)
+Database: SQLite (via SQLAlchemy)
+APIs and Parsing: Custom HTML parser for battle replay data
+Version Control: Git and GitHub for collaborative development
+
+**AI Assistance**  
+Portions of this project were developed with the assistance of AI tools for code suggestions, debugging, and documentation refinement:
+- [OpenAI's ChatGPT](https://openai.com/chatgpt)
+- [Anthropic's Claude](https://www.anthropic.com/claude)
+- [GitHub Copilot](https://github.com/features/copilot)
+
+**Images**  
+Pokémon images are sourced from [Bulbapedia Archives](https://archives.bulbagarden.net/wiki/Main_Page).  
+© Game Freak / The Pokémon Company. Usage under [Bulbagarden Archives License](https://bulbapedia.bulbagarden.net/wiki/Bulbapedia:Copyrights).
+
+**Libraries and Tools**  
+- [Google Material Design Icons (MDI)](https://fonts.google.com/icons) – [License](https://github.com/google/material-design-icons/blob/master/LICENSE)
+- [Google Fonts](https://fonts.google.com/) – [License](https://fonts.google.com/attribution)
+- [Google Charts JS](https://developers.google.com/chart) – [License](https://github.com/GoogleWebComponents/google-chart/blob/main/LICENSE)
+- [GLSL Canvas JS](https://github.com/patriciogonzalezvivo/glslCanvas) – [License](https://github.com/patriciogonzalezvivo/glslCanvas/blob/master/LICENSE)
+- [Bootstrap CSS & JS](https://getbootstrap.com/) – [License](https://github.com/twbs/bootstrap/blob/main/LICENSE)
