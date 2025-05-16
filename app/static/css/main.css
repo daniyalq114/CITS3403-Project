@@ -525,7 +525,11 @@ body {
   text-align: center;
   overflow:scroll;
 }
-
+.replay-record tr.active { 
+  font-weight: bold;
+  border: 2px solid #ffb300;
+  transition: background 0.2s;
+}
 .replay-record th,
 .replay-record td,
 .part2 th,

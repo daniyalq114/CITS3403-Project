@@ -239,7 +239,8 @@ def logout():
 @main.route("/visualise/match_data/<int:match_id>")
 @login_required
 def visualise_match_data(match_id):
-    username = current_user.username  # Ensure data belongs to logged-in user
+    # Use shared_username if set, otherwise use current user's username
+    username = session.get("shared_username", current_user.username)
     data = fetch_pokemon_data_for_usr(username, match_id)
     return jsonify(data)
 
