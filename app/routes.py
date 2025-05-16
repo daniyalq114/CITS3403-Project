@@ -45,6 +45,7 @@ def upload():
                 flash(f"Showdown username mismatch! Your current showdown username is '{user.showdown_username}'.", "danger")
                 return redirect(url_for("main.upload"))
         else:
+            # Save Showdown username if not already set
             user.showdown_username = s_username
             db.session.commit()
             flash("Showdown username updated successfully!", "success")
@@ -57,6 +58,7 @@ def upload():
         # Proceed to visualisation
         return redirect(url_for("main.visualise"))
 
+    # Display upload form if GET request
     return render_template("upload.html", active="upload")
 
 

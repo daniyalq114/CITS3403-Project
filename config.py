@@ -13,3 +13,8 @@ class DeploymentConfig(Config):
 class TestConfig(Config):
     SQLALCHEMY_DATABASE_URI = "sqlite:///:memory:"
     TESTING = True
+    SECRET_KEY = 'test-secret-key'
+    WTF_CSRF_ENABLED = False
+    SERVER_NAME = 'localhost.localdomain'  
+    APPLICATION_ROOT = '/'                 
+    PREFERRED_URL_SCHEME = 'http'          
