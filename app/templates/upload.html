@@ -8,26 +8,28 @@
 
         <form action="{{ url_for('main.upload') }}" method="post" class="upload-form">
           <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
           <div class="step">
             <p>Step 1: Enter your Pokémon Showdown username</p>
             <input type="text" name="username" placeholder="Your Showdown username" required>
           </div>
+
           <div class="step">
             <p>Step 2: Enter your Pokémon Showdown replays</p>
             <div class="table-container">
-              <table class="replays-table">
-                <tbody> 
-                {% for i in range(40) %}
-                <tr>
-                  <td>
-                    <input type="url" name="replay_{{ i }}" placeholder="https://replay.pokemonshowdown.com/...">
-                  </td>
-                </tr>
-                {% endfor %}
+              <table class="replays-table" id="replays-table">
+                <tbody>
+                  <tr>
+                    <td>
+                      <input type="url" name="replay_0" placeholder="https://replay.pokemonshowdown.com/...">
+                    </td>
+                  </tr>
                 </tbody>
               </table>
+              <button type="button" id="add-replay-btn" class="generate-btn mt-2">+ Add Replay</button>
             </div>
           </div>
+
           <div class="step">
             <p>Step 3: Submit to visualise your performance!</p>
             <button type="submit" class="generate-btn">Generate Report</button>
@@ -36,5 +38,22 @@
       </div>
     </div>
   </div>
+
+  <script>
+    const tableBody = document.querySelector('#replays-table tbody');
+    const addBtn = document.getElementById('add-replay-btn');
+    let replayCount = 1;
+
+    addBtn.addEventListener('click', () => {
+      const newRow = document.createElement('tr');
+      newRow.innerHTML = `
+        <td>
+          <input type="url" name="replay_${replayCount}" placeholder="https://replay.pokemonshowdown.com/...">
+        </td>
+      `;
+      tableBody.appendChild(newRow);
+      replayCount++;
+    });
+  </script>
 {% endblock %}
 
