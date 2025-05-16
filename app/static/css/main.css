@@ -466,26 +466,56 @@ body {
 }
 /* Part 2: two items side by side */
 .part2-container {
-  display: flex;
-  justify-content: center;
-  gap: 1.5rem;
-  flex-wrap: wrap;
+  display: block;
+  width: 100%;
   margin-bottom: 2rem;
+  overflow-x: auto;
 }
 .placeholder-table.part2 {
-  flex: 0 1 45%;
-  height: 200px;
+  width: 95%;
+  max-width: 900px;
+  min-width: 600px;
+  margin: 1rem auto 2rem;
+  background: #e3f0fc;
+  border-radius: 4px;
+  flex: none;
+}
+
+/* Part 2: Blue background with darker blue stripes */
+.part2 {
+  background-color: #e3f0fc; /* Light blue */
+}
+
+.part2.table-striped tbody tr:nth-child(odd) {
+  background-color: #90caf977; /* Light blue */
+}
+
+.part2.table-striped tbody tr:nth-child(even) {
+  background-color: #90caf9; /* Darker blue */
 }
 
 /* Part 3: grid of 4 usage charts */
 .part3-container {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
   gap: 1rem;
   margin-bottom: 2rem;
+  justify-items: center; /* Center the charts in their grid cells */
 }
 .placeholder-table.part3 {
+  width: 325px;
+  max-width: 100%;
+  min-width: 180px;
   height: 180px;
+  margin: 0 auto;
+  background: #fff;
+  border-radius: 8px;
+  box-sizing: border-box;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 }
 
 /* Replay Record Table */
@@ -497,10 +527,14 @@ body {
 }
 
 .replay-record th,
-.replay-record td {
+.replay-record td,
+.part2 th,
+.part2 td {
   border: 1px solid #ccc;
   padding: 0.5rem;
 }
+
+
 
 .replay-record th {
   background-color: #f4f4f4;

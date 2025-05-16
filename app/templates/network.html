@@ -4,21 +4,26 @@
   <h1>Expand your Network</h1>
   <p>Enter the username of someone you’d like to connect with:</p>
 
+  <ul class="flashes"></ul>
+
   <form action="{{ url_for('main.network') }}" method="post" class="network-form">
     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
     <input
       type="text"
       name="search_user"
-      list="usernames"
+      id="search-user-input"
       placeholder="Search username..."
+      autocomplete="off"
       required
+      list="usernames"
     >
-    <datalist id="usernames">
-      {% for u in users %}
-        <option value="{{ u }}">
-      {% endfor %}
-    </datalist>
-
-    <button type="submit" class="btn">Send Request</button>
+    <datalist id="usernames"></datalist>
+    <button type="submit" class="btn">Share With User</button>
   </form>
+
+  <script>
+    const allUsernames = {{ users|tojson|safe }};
+    const alreadyShared = {{ shared_with|tojson|safe }};
+  </script>
+  <script src="{{ url_for('static', filename='share_user.js') }}"></script>
 {% endblock %}

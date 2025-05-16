@@ -9,6 +9,7 @@
   <script type="text/javascript" src="https://rawgit.com/patriciogonzalezvivo/glslCanvas/master/dist/GlslCanvas.js"></script>
   <!-- Google Charts JS -->
   <script src="https://www.gstatic.com/charts/loader.js"></script>
+  <!-- Script for AJAX client side rendering for visualise -->
   <script src="{{ url_for('static', filename='populate_graphs.js') }}"></script>
   <!-- Bootstrap CSS and JS -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -83,18 +84,21 @@
     </div>
   </nav>
   
-  <main class="content">
-    {% with messages = get_flashed_messages(with_categories=true) %}
-    {% if messages %}
-      <ul class="flashes">
-        {% for category, message in messages %}
-          <li class="flash {{ category }}">{{ message }}</li>
-        {% endfor %}
-      </ul>
+<main class="content">
+    {% if not suppress_flashes %}
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          <ul class="flashes">
+            {% for category, message in messages %}
+              <li class="flash {{ category }}">{{ message }}</li>
+            {% endfor %}
+          </ul>
+        {% endif %}
+      {% endwith %}
     {% endif %}
-  {% endwith %}
-  {% block content %}{% endblock %}
-  </main>
+
+    {% block content %}{% endblock %}
+</main>
 
   <!-- Theme-toggle script -->
   <script>

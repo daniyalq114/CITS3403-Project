@@ -1,30 +1,47 @@
 {% extends "base.html" %}
+{% set suppress_flashes = true %}
 
 {% block content %}
-  <div class="content">
-    <h1>Visualise your Replays</h1>
+  <h1>Visualise your Battle Performance</h1>
+  <p>Enter the username of someone whose data you'd like to view instead of yours:</p>
 
-    <form action="{{ url_for('main.visualise') }}" method="post" class="visualise-form">
-      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-      <label for="username">
-        Enter the Pokémon Showdown username whose report you want to view
-      </label>
-      <div class="form-inline">
-        <input
-          type="text"
-          id="username"
-          name="username"
-          value="{{ username }}"
-          required
-          placeholder="username"
-        >
-        <button type="submit" class="btn">Submit</button>
-      </div>
-    </form>
+  {# Show flash messages just below the prompt #}
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      <ul class="flashes">
+        {% for category, message in messages %}
+          <li class="flash {{ category }}">{{ message }}</li>
+        {% endfor %}
+      </ul>
+    {% endif %}
+  {% endwith %}
 
-    {% if data_submitted %}
-      <h2>Username: {{ username }}</h2>
-      <p>PokéPaste: <a href="{{ pokepaste }}" target="_blank">{{ pokepaste }}</a></p>
+  <form method="post" action="{{ url_for('main.visualise') }}" class="network-form mb-2">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <input list="usernames" name="shared_user" placeholder="Search shared user..." required>
+    <datalist id="usernames">
+      {% for u in shared_with %}
+        <option value="{{ u }}">
+      {% endfor %}
+    </datalist>
+    <button type="submit" class="btn">View Shared Data</button>
+  </form>
+
+  <form method="post" action="{{ url_for('main.visualise') }}" class="network-form mb-4">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <input type="hidden" name="clear_shared_user" value="true">
+    <button type="submit" class="btn btn-outline-secondary">View Your Own Data</button>
+  </form>
+
+  <script>
+    // This makes `sharedUsernames` available in JS
+    const sharedUsernames = {{ shared_with|tojson }};
+  </script>
+  <script src="{{ url_for('static', filename='select_shared_user.js') }}"></script>
+
+  {% if data_submitted %}
+      <!-- <h2>Username: {{ username }}</h2>
+      <p>PokéPaste: <a href="{{ pokepaste }}" target="_blank">{{ pokepaste }}</a></p> -->
 
       <!-- Part 1 -->
       <p class="section-label">Part 1: Replay Record</p>
@@ -54,24 +71,24 @@
             </tr>
           </thead>
           <tbody>
-            {% for game in games %}
-            <tr>
+            {% for game in parsed_logs %}
+            <tr data-match-id="{{ game.match_id }}">
               <!-- Game number -->
-              <td>{{ game.id }}</td>
+              <td>{{ game.match_num }}</td>
               
               <!-- Win/Loss -->
-              <td class="{{ 'win' if game.win else 'loss' }}">
+              <td class="{{ 'win' if game['win'] == replay_username else 'loss' }}">
                 <b>{{ 'Win' if game.win else 'Loss' }}</b>
               </td>
 
               <!-- Replay Link -->
               <td>
-                <a href="{{ game.replay.search_request }}" target="_blank">View Replay</a>
+                <a href="{{ game['replay_url'] }}" target="_blank">View Replay</a>
               </td>
 
               <!-- Opposing Team -->
               <td class="sprites opp">
-                {% for pokemon in game.oppteam %}
+                {% for pokemon in game['oppteam'] %}
                   <span class="pokemon-name">{{ pokemon }}</span>
                   {% if not loop.last %}, {% endif %}
                 {% endfor %}
@@ -79,7 +96,7 @@
 
               <!-- Your Picks -->
               <td class="sprites pick">
-                {% for pokemon in game.usrpicks %}
+                {% for pokemon in game['usr_picks'] %}
                   <span class="pokemon-name">{{ pokemon }}</span>
                   {% if not loop.last %}, {% endif %}
                 {% endfor %}
@@ -87,18 +104,18 @@
 
               <!-- Their Picks -->
               <td class="sprites pick">
-                {% for pokemon in game.opppicks %}
+                {% for pokemon in game['enemy_picks'] %}
                   <span class="pokemon-name">{{ pokemon }}</span>
                   {% if not loop.last %}, {% endif %}
                 {% endfor %}
               </td>
 
               <!-- Rest of the columns -->
-              <td>{{ 'Yes' if game.Terastallize[0] else 'No' }}</td>
-              <td>{{ 'Yes' if game.Terastallize[1] else 'No' }}</td>
-              <td>{{ 'Yes' if game.OTS else 'No' }}</td>
-              <td>{{ game.ELO[1] }} <b>↑</b> {{ game.ELO[0] }}</td>
-              <td>{{ game.ELO[2] }}</td>
+              <td>{{ 'Yes' if game['terastallize'][0] else 'No' }}</td>
+              <td>{{ 'Yes' if game['terastallize'][1] else 'No' }}</td>
+              <td>{{ 'Yes' if game['OTS'] else 'No' }}</td>
+              <td>{{ game['elo'][1] }} <b>↑</b> {{ game['elo'][0] }}</td>
+              <td>{{game['elo'][2] }}</td>
             </tr>
             {% endfor %}
           </tbody>
@@ -107,32 +124,36 @@
 
       <!-- Part 2 -->
       <p class="section-label">Part 2: Individual Pokémon Data</p>
-      <div class="part2-container">
-        <div class="placeholder-table part2"></div>
-        <div class="placeholder-table part2"></div>
+      <div class="part2-container table-responsive">
+        <!-- To contain number of pokemon defeated, number of games won with that pokemon -->
+        <table class="placeholder-table part2 table-striped">
+          <thead>
+            <tr>
+              <th></th>
+              <th colspan="1">Pokemon defeated</th> 
+              <th colspan="1">Times fainted</th> 
+              <th colspan="1">win/lose ratio%</th>
+              <th colspan="1">Games won</th>
+            </tr>
+          </thead>
+          <tbody>
+
+          </tbody>
+        </table>
       </div>
 
       <!-- Part 3 -->
       <p class="section-label">Part 3: Move Usage</p>
       <div class="part3-container">
-        {% for pokemon, moves in move_data.items() %}
-          <div class="part3 placeholder-table">
-            <h3>{{ pokemon }}</h3>
-            <ul>
-              {% for move, count in moves.items() %}
-                <li>{{ move }}: {{ count }}</li>
-              {% endfor %}
-            </ul>
-          </div>
-        {% endfor %}
+        <!-- Fetch move data from most recent game -->
+         <h3>name</h3>
+         <!-- Google chart goes here -->
       </div>
 
       <!-- Hidden JSON data for JavaScript -->
-      <script id="move-data" type="application/json">
-        {{ move_data | tojson }}
+      <script id="default-active-match" type="application/json">
+        {{ default_active_match_id | tojson }}
       </script>
     {% endif %}
-  </div>
+</div>
 {% endblock %}
-
-
