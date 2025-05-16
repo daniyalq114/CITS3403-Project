@@ -90,7 +90,7 @@ flask db upgrade # apply the migration to the database
 
 10. Run LugiAnalytics
 ```shell
-`flask run`
+flask run
 ```
 11. Open the returned url, e.g. for `* Running on http://127.0.0.1:5000` open `http://127.0.0.1:5000` in your browser. 
 
