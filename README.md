@@ -36,7 +36,7 @@ Database: SQLite (via SQLAlchemy)
 APIs and Parsing: Custom HTML parser for battle replay data
 Version Control: Git and GitHub for collaborative development
 
-### Running the test site
+### Running the site
 1. Navigate to the directory you'd like to store LugiAnalytics, for instance:
 ```shell
 cd Desktop/dev/
@@ -96,6 +96,18 @@ flask run
 
 When you're done, exit the virtual environment with `deactivate`
 
+### Running the tests
+
+To run unit tests, run the following command in the root directory:
+
+``` shell
+PYTHONPATH=$PYTHONPATH:. python3 -m unittest tests/unittests.py -v
+```
+
+To run selenium tests, run the following command in the root directory:
+``` shell
+
+```
 
 ## Credits
 

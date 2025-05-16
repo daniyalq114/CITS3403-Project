@@ -58,52 +58,56 @@ class RoutesTestCase(unittest.TestCase):
         self.app_context.pop()
 
     def test_public_routes(self):
-        # These routes should be accessible without login
-        routes = ['main.index', 'main.login', 'main.signup']
-        for route in routes:
-            response = self.client.get(url_for(route))
-            self.assertEqual(response.status_code, 200)
+        with self.app.test_request_context():
+            # These routes should be accessible without login
+            routes = ['main.index', 'main.login', 'main.signup']
+            for route in routes:
+                response = self.client.get(url_for(route))
+                self.assertEqual(response.status_code, 200)
 
     def test_protected_routes_without_login(self):
-        # These routes should redirect to login when not authenticated
-        protected_routes = ['main.upload', 'main.visualise', 'main.network']
-        for route in protected_routes:
-            response = self.client.get(url_for(route))
-            self.assertEqual(response.status_code, 302)  # Redirect
-            self.assertTrue('/login' in response.location)
+        with self.app.test_request_context():
+            # These routes should redirect to login when not authenticated
+            protected_routes = ['main.upload', 'main.visualise', 'main.network']
+            for route in protected_routes:
+                response = self.client.get(url_for(route))
+                self.assertEqual(response.status_code, 302)  # Redirect
+                self.assertTrue('/login' in response.location)
 
     def test_protected_routes_with_login(self):
-        # Create and login a test user
-        u = User(username="go", email="go@email.com")
-        u.set_password("scorbunny")
-        db.session.add(u)
-        db.session.commit()
+        with self.app.test_request_context():
+            # Create and login a test user
+            u = User(username="go", email="go@email.com")
+            u.set_password("scorbunny")
+            db.session.add(u)
+            db.session.commit()
 
-        # Login
-        self.client.post(url_for('main.login'), data={
-            'username': 'go',
-            'password': 'scorbunny'
-        }, follow_redirects=True)
+            # Login
+            self.client.post(url_for('main.login'), data={
+                'username': 'go',
+                'password': 'scorbunny'
+            }, follow_redirects=True)
 
-        # Test protected routes
-        protected_routes = ['main.upload', 'main.visualise', 'main.network']
-        for route in protected_routes:
-            response = self.client.get(url_for(route))
-            self.assertEqual(response.status_code, 200)
+            # Test protected routes
+            protected_routes = ['main.upload', 'main.visualise', 'main.network']
+            for route in protected_routes:
+                response = self.client.get(url_for(route))
+                self.assertEqual(response.status_code, 200)
 
     def test_login_with_valid_credentials(self):
-        # Create test user
-        u = User(username="chloe", email="chloe@email.com")
-        u.set_password("yamper")
-        db.session.add(u)
-        db.session.commit()
+        with self.app.test_request_context():
+            # Create test user
+            u = User(username="chloe", email="chloe@email.com")
+            u.set_password("yamper")
+            db.session.add(u)
+            db.session.commit()
 
-        # Try logging in
-        response = self.client.post(url_for('main.login'), data={
-            'username': 'chloe',
-            'password': 'yamper'
-        }, follow_redirects=True)
-        self.assertEqual(response.status_code, 200)
+            # Try logging in
+            response = self.client.post(url_for('main.login'), data={
+                'username': 'chloe',
+                'password': 'yamper'
+            }, follow_redirects=True)
+            self.assertEqual(response.status_code, 200)
 
 if __name__ == '__main__':
     unittest.main()
