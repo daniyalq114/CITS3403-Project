@@ -95,15 +95,9 @@ flask db upgrade # apply the migration to the database
     | POSIX    | bash/zsh   | `export SECRET_KEY='your-very-secret-key'` |
     | Windows  | Powershell | `$env:SECRET_KEY = "your-very-secret-key"` |
 
-9. Creates /instance/app.db and applies migrations:
-`flask db upgrade`
-
-10. NOT IMPLEMENTED (Optional) Add test users and matches: 
-`python seed.py`
-
-11. Run LugiAnalytics
+9. Run LugiAnalytics
 `flask run`
 
-12. Open the returned url, e.g. for `* Running on http://127.0.0.1:5000` open `http://127.0.0.1:5000` in your browser. 
+10. Open the returned url, e.g. for `* Running on http://127.0.0.1:5000` open `http://127.0.0.1:5000` in your browser. 
 
 When you're done, exit the virtual environment with `deactivate`

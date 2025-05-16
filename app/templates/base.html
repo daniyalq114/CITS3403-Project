@@ -83,18 +83,21 @@
     </div>
   </nav>
   
-  <main class="content">
-    {% with messages = get_flashed_messages(with_categories=true) %}
-    {% if messages %}
-      <ul class="flashes">
-        {% for category, message in messages %}
-          <li class="flash {{ category }}">{{ message }}</li>
-        {% endfor %}
-      </ul>
+<main class="content">
+    {% if not suppress_flashes %}
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          <ul class="flashes">
+            {% for category, message in messages %}
+              <li class="flash {{ category }}">{{ message }}</li>
+            {% endfor %}
+          </ul>
+        {% endif %}
+      {% endwith %}
     {% endif %}
-  {% endwith %}
-  {% block content %}{% endblock %}
-  </main>
+
+    {% block content %}{% endblock %}
+</main>
 
   <!-- Theme-toggle script -->
   <script>
