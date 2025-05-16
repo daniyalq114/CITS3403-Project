@@ -34,6 +34,7 @@ class Pokemon:
     name: str = ""
     moves: dict = field(default_factory=dict)
     wins: int = 0
+    defeated:bool = False
 
 @dataclass
 class Player:
@@ -131,8 +132,11 @@ class ReplayLogParser:
 
                 case 'faint':
                     active_p_num, nickname = line[2].split(": ")
+                    # set this pokemon's defeated field to True
+                    self.players[active_p_num[:2]].team[nickname].defeated = True
                     enemy_index = int(active_p_num[1]) % 2 # p1a -> 1, p2a -> 0
                     attacker_pokemon = self.last_attacker[enemy_index] 
+                    # increment the number of wins for the attacking pokemon
                     self.players[f"p{enemy_index + 1}"].team[attacker_pokemon].wins += 1
                     
 
@@ -211,7 +215,9 @@ def save_parsed_log_to_db(parsed_log, db, s_username):
             team_pokemon = TeamPokemon(
                 team_id=team.id,
                 pokemon_name=pokemon_name, # I hope this works for weirdly nicknamed things
-                ispick=True if pokemon_name in players[team_key].picks else False
+                ispick=True if pokemon_name in players[team_key].picks else False,
+                wins=pokemon_data.wins,
+                defeated=pokemon_data.defeated
             )
             db.session.add(team_pokemon)
             db.session.commit()
@@ -246,8 +252,10 @@ def fetch_usr_matches_from_db(showdown_username):
         raise Exception("User doesn't exist!")
 
     match_list = []
-    for db_match in user.matches:
+    user_matches = sorted(user.matches, key=lambda m: m.id)
+    for match_num, db_match in enumerate(user_matches, start=1):
         match_entry = {}
+        match_entry["match_num"] = match_num
         match_entry["id"] = db_match.id
         match_entry["win"] = db_match.winner
         match_entry["enemyname"] = db_match.enemyname
@@ -266,15 +274,6 @@ def fetch_usr_matches_from_db(showdown_username):
             db_match.p2_initial_elo
         ]
 
-        # Moves data
-        pokemon = [p for team in db_match.teams for p in team.pokemons]
-        match_entry["moves"] = {
-            p.pokemon_name: [
-                {"move_name": mu.move_name, "times_used": mu.times_used} for mu in p.move_usages
-            ]
-            for p in pokemon
-        }
-
         # Additional fields
         match_entry["terastallize"] = [False, False]  # Placeholder
         match_entry["OTS"] = False  # Placeholder
@@ -282,6 +281,44 @@ def fetch_usr_matches_from_db(showdown_username):
         match_list.append(match_entry)
 
     return match_list
+
+def fetch_pokemon_data_for_usr(showdown_username, active_match_id):
+    """
+    Fetches information required for tables two and three. Including the 
+    number of pokemon defeated by that pokemon, the number of matches won/lost, 
+    and the number of times that pokemon used a particular move.
+    -showdown_username: the showdown username whos matches to search
+    -active_match_id: the match whos pokemon you want information on 
+    """
+    target_match = Match.query.filter_by(id=active_match_id).first()
+    if not target_match:
+        raise Exception("Active match doesn't exist!")
+    target_team = [t for t in target_match.teams if t.is_user_team][0]
+    target_pokemon = {p.pokemon_name for p in target_team.pokemons}
+
+    user = User.query.filter_by(showdown_username=showdown_username).first()
+    if not user: 
+        raise Exception("User doesn't exist!")
+    
+    poke_dict = dict()
+    for db_match in user.matches:
+        won = int(db_match.winner != db_match.enemyname)
+        usr_team = [t for t in db_match.teams if t.is_user_team][0] 
+        for pokemon in usr_team.pokemons:
+            # we only care about pokemon in the active match
+            if pokemon.pokemon_name not in target_pokemon: continue
+            # construct dict if pokemon not already in poke_dict
+            poke_dict[pokemon.pokemon_name] = poke_dict.get(
+                pokemon, {"moves":{}, "wins":0, "losses":0, "matches_won":0}
+            )
+            # construct or increment values for the active pokemon
+            cur_poke = poke_dict[pokemon.pokemon_name]
+            for mu in pokemon.move_usages: # add moves or increment move counts on existing moves
+                cur_poke["moves"] = cur_poke["moves"].get(mu.move_name, 0) + mu.times_used 
+            cur_poke["wins"] += pokemon.wins
+            cur_poke["losses"] += int(pokemon.defeated)
+            cur_poke["matches_won"] += won
+    return poke_dict
 
 def unpack_display_replay(replay):
     """For debugging - prints the information of a parsed log """

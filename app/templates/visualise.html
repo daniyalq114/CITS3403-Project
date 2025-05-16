@@ -15,7 +15,6 @@
           id="username"
           name="username"
           value="{{ username }}"
-          required
           placeholder="username"
         >
         <button type="submit" class="btn">Submit</button>
@@ -55,9 +54,9 @@
           </thead>
           <tbody>
             {% for game in parsed_logs %}
-            <tr>
+            <tr data-match-id="{{ game.match_id }}">
               <!-- Game number -->
-              <td>{{ game.id }}</td>
+              <td>{{ game.match_num }}</td>
               
               <!-- Win/Loss -->
               <td class="{{ 'win' if game['win'] == replay_username else 'loss' }}">
@@ -108,29 +107,31 @@
       <!-- Part 2 -->
       <p class="section-label">Part 2: Individual Pokémon Data</p>
       <div class="part2-container">
-        <div class="placeholder-table part2"></div>
-        <div class="placeholder-table part2"></div>
+        <!-- To contain number of pokemon defeated, number of games won with that pokemon -->
+        <div class="placeholder-table part2 table-striped">
+          <thead>
+            <tr>
+              <th colspan="3">Win %</th> <!-- Grouping Game, Result, Replay Links, Opposing Team, Your Picks -->
+              <th colspan="1">Games won</th>
+            </tr>
+          </thead>
+          <tbody>
+
+          </tbody>
+        </div>
       </div>
 
       <!-- Part 3 -->
       <p class="section-label">Part 3: Move Usage</p>
       <div class="part3-container">
         <!-- Fetch move data from most recent game -->
-        {% for pokemon in active_match['usr_picks'] %}
-          <div class="part3 placeholder-table">
-            <h3>{{ pokemon.pokemon_name }}</h3>
-            <ul>
-              {% for move, count in active_match["moves"][pokemon.pokemon_name] %}
-                <li>{{ move }}: {{ count }}</li>
-              {% endfor %}
-            </ul>
-          </div>
-        {% endfor %}
+         <h3>name</h3>
+         <!-- Google chart goes here -->
       </div>
 
       <!-- Hidden JSON data for JavaScript -->
-      <script id="move-data" type="application/json">
-        {{ active_match["moves"]| tojson }}
+      <script id="default-active-match" type="application/json">
+        {{ default_active_match_id | tojson }}
       </script>
     {% endif %}
   </div>

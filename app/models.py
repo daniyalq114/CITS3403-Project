@@ -51,6 +51,8 @@ class TeamPokemon(db.Model):
     team_id = db.Column(db.Integer, db.ForeignKey("team.id"), nullable=False)  # Foreign key to Team
     pokemon_name = db.Column(db.String, nullable=False)  # Pokémon name
     ispick = db.Column(db.Boolean)
+    wins = db.Column(db.Integer)
+    defeated = db.Column(db.Boolean)
     # nickname = db.Column(db.String)  # Optional nickname
     # position = db.Column(db.Integer)  # Optional position (e.g., 1-6)
     team = db.relationship("Team", back_populates="pokemons")  # Back reference to Team
