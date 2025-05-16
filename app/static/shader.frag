@@ -1,3 +1,5 @@
+// yes i did write a shader for the agile project yes i am very smart thank you
+
 // using low precision float
 precision lowp float;
 // u_resolution gets the resolution of the canvas
