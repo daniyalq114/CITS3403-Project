@@ -74,29 +74,25 @@ flask db init # initialise database
 flask db migrate # set up the database to follow schema in models.py
 flask db upgrade # apply the migration to the database
 ```
-8. Run LugiAnalytics
-```shell
-pip install -r requirements.txt
-```
-9. Set the Flask application environment variable:
+8. Set the Flask application environment variable:
 
     | Platform | Shell      | Command                     |
     | -------- | ---------- | --------------------------- |
     | POSIX    | bash/zsh   | `export FLASK_APP=app.py`   |
     | Windows  | Powershell | `$env:FLASK_APP = "app.py"` |
 
-10. Set the Flask secret key (replace 'your-very-secret-key' with a real random string when deploying):
+9. Set the Flask secret key (replace 'your-very-secret-key' with a real random string when deploying):
 
     | Platform | Shell      | Command                                    |
     | -------- | ---------- | ------------------------------------------ |
     | POSIX    | bash/zsh   | `export SECRET_KEY='your-very-secret-key'` |
     | Windows  | Powershell | `$env:SECRET_KEY = "your-very-secret-key"` |
 
-11. Run LugiAnalytics
+10. Run LugiAnalytics
 ```shell
 `flask run`
 ```
-12. Open the returned url, e.g. for `* Running on http://127.0.0.1:5000` open `http://127.0.0.1:5000` in your browser. 
+11. Open the returned url, e.g. for `* Running on http://127.0.0.1:5000` open `http://127.0.0.1:5000` in your browser. 
 
 When you're done, exit the virtual environment with `deactivate`
 
